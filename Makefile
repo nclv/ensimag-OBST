@@ -23,14 +23,14 @@ $(BINDIR)/compileBST: $(CSOURCE)
 %.pdf: $(LATEXSOURCE)
 	$(LATEXC) -output-directory $(REPORTDIR) $^ 
 
-$(DOCDIR)/index.html: $(SRCDIR)/Doxyfile $(CSOURCE) 
-	$(DOCC) $(SRCDIR)/Doxyfile
+# $(DOCDIR)/index.html: $(SRCDIR)/Doxyfile $(CSOURCE) 
+# 	$(DOCC) $(SRCDIR)/Doxyfile
 
 binary: $(BINDIR)/compileBST
 
 report: $(PDF) 
 
-doc: $(DOCDIR)/index.html
+# doc: $(DOCDIR)/index.html
 
 clean:
 	rm -rf $(DOCDIR) $(BINDIR)/* $(REPORTDIR)/*.aux $(REPORTDIR)/*.log  $(REPORTDIR)/rapport.pdf 
