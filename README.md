@@ -7,4 +7,6 @@ comparaisons lors d’une opération de recherche (i.e. sa profondeur moyenne) ;
 # Q1
 Voir http://web.eecs.utk.edu/~leparker/Courses/CS581-spring14/Lectures/7-Jan-30-Opt-Binary-Search-no-answers.pdf et http://www.euroinformatica.ro/documentation/programming/!!!Algorithms_CORMEN!!!/DDU0091.html
 
+faire sans les qj
+
 # Q2
