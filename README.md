@@ -3,3 +3,8 @@ Les ABR sont une structure de données utilisée pour implémenter un dictionnai
 
 Le but de ce TP est de générer un programme implémentant un ABR qui minimise le nombre moyen de
 comparaisons lors d’une opération de recherche (i.e. sa profondeur moyenne) ; un tel ABR est dit _optimal_.
+
+# Q1
+Voir http://web.eecs.utk.edu/~leparker/Courses/CS581-spring14/Lectures/7-Jan-30-Opt-Binary-Search-no-answers.pdf et http://www.euroinformatica.ro/documentation/programming/!!!Algorithms_CORMEN!!!/DDU0091.html
+
+# Q2
