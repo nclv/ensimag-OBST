@@ -8,6 +8,7 @@ Demo pour Adrien: https://blog.asarkar.com/assets/docs/algorithms-curated/Optima
 
 Code: https://stackoverflow.com/questions/16987670/dynamic-programming-why-knuths-improvement-to-optimal-binary-search-tree-on2
 https://github.com/titu1994/Optimal-Binary-Search-Tree/blob/master/Optimal%20Binary%20Search%20Tree/src/Optimal%20Binary%20Search%20Tree.c
+http://www.eecs.tufts.edu/~aloupis/comp150/projects/Cori_Jacoby_Alex_King_Final_Report_v2.pdf
 
 
 # Q1
