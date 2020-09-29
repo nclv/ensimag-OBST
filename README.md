@@ -4,8 +4,6 @@ Les ABR sont une structure de données utilisée pour implémenter un dictionnai
 Le but de ce TP est de générer un programme implémentant un ABR qui minimise le nombre moyen de
 comparaisons lors d’une opération de recherche (i.e. sa profondeur moyenne) ; un tel ABR est dit _optimal_.
 
-Demo pour Adrien: https://blog.asarkar.com/assets/docs/algorithms-curated/Optimal%20BST%20-%20Carnegie%20Mellon%20University.pdf
-
 Code: https://stackoverflow.com/questions/16987670/dynamic-programming-why-knuths-improvement-to-optimal-binary-search-tree-on2
 https://github.com/titu1994/Optimal-Binary-Search-Tree/blob/master/Optimal%20Binary%20Search%20Tree/src/Optimal%20Binary%20Search%20Tree.c
 http://www.eecs.tufts.edu/~aloupis/comp150/projects/Cori_Jacoby_Alex_King_Final_Report_v2.pdf
@@ -39,7 +37,7 @@ for (size_t i = 0; i < N; ++i) {
     }
 }
 ```
-
+ou
 ```C
 #define sommes_p(i, j) (sommes_p[j] - sommes_p[i])
 
@@ -47,16 +45,21 @@ double *sommes_p = malloc(N * sizeof(double));
 
 double somme = 0;
 for (size_t i = 0; i < N; ++i) {
-	somme += probabilites[j];
+	somme += probabilites[i];
 	sommes_p[i] = somme;
 }
 ```
 
 # Q2
-voir https://pdf.sciencedirectassets.com/271538/1-s2.0-S0304397500X00722/1-s2.0-S0304397596003209/main.pdf
+voir https://pdf.sciencedirectassets.com/271538/1-s2.0-S0304397500X00722/1-s2.0-S0304397596003209/main.pdf et https://blog.asarkar.com/assets/docs/algorithms-curated/Optimal%20BST%20-%20Carnegie%20Mellon%20University.pdf
 
-On a $\frac{n(n-1)}{2}$ de $i$ et $j$ tels que $0 \leq i < j < n$.
+On a $\frac{n(n-1)}{2}$ possibilités de $i$ et $j$ tels que $0 \leq i < j < n$. L'espace requis est donc en $\Theta(n^2)$.
+
+On sait que tout sous arbre d'un ABR optimal est un ABR optimal. On choisit donc de prendre comme racine tous les noeuds de l'ABR en faisant varier $k$ de $i$ à $j$. Lorsque l'on choisit que le $k$ème noeuds est la racine, on calcule récursivement le coût optimal de $i$ à $k - 1$ et de $k + 1$ à $j$. Comme l'on choisit $k$ parmi $j - i$ possibilités pour $i$ et $j$ tels que $0 \leq i < j < n$, la complexité temporelle est en $\Theta(n^3)$
+
+On peut aussi le voir de cette façon:
+Il y a un total de $n^2$ sous-problèmes (ou du moins en $\Theta(n^2)$) et chaque sous-problème est de complexité $\Theta(n)$ si l'on suppose que tous ses sous-problèmes sont déjà résolus. On a donc une complexité totale en $\Theta(n^3)$.
 
 # Q3
-voir lien Q2
+voir les lien Q2
 voir ce que le résultat permet https://www.student.cs.uwaterloo.ca/~cs466/Old_courses/F03/3-optimal_search_trees.pdf
