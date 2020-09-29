@@ -40,6 +40,18 @@ for (size_t i = 0; i < N; ++i) {
 }
 ```
 
+```C
+#define sommes_p(i, j) (sommes_p[j] - sommes_p[i])
+
+double *sommes_p = malloc(N * sizeof(double));
+
+double somme = 0;
+for (size_t i = 0; i < N; ++i) {
+	somme += probabilites[j];
+	sommes_p[i] = somme;
+}
+```
+
 # Q2
 voir https://pdf.sciencedirectassets.com/271538/1-s2.0-S0304397500X00722/1-s2.0-S0304397596003209/main.pdf
 
