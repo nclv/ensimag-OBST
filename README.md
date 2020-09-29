@@ -14,7 +14,7 @@ http://www.eecs.tufts.edu/~aloupis/comp150/projects/Cori_Jacoby_Alex_King_Final_
 # Q1
 Voir http://web.eecs.utk.edu/~leparker/Courses/CS581-spring14/Lectures/7-Jan-30-Opt-Binary-Search-no-answers.pdf et http://www.euroinformatica.ro/documentation/programming/!!!Algorithms_CORMEN!!!/DDU0091.html
 
-On effectue un pré-calcul $somme_p(i, j) = \sum_{l=i}^{j-1}p_l$ pour tout $0 \leq i < j < n$. On accède ensuite à la somme partielle des probabilités entre $i$ et $j$ par `sommes_p(i, j)`.
+On effectue un pré-calcul $somme_p(i, j) = \sum_{l=i}^{j-1}p_l$ pour tout $0 \leq i < j < n$. On accède ensuite à la somme partielle des probabilités entre $i$ et $j$ par $\lstinline{sommes_p(i, j)}$.
 
 ```C
 #define N (10)
@@ -42,6 +42,8 @@ for (size_t i = 0; i < N; ++i) {
 
 # Q2
 voir https://pdf.sciencedirectassets.com/271538/1-s2.0-S0304397500X00722/1-s2.0-S0304397596003209/main.pdf
+
+On a $\frac{n(n-1)}{2}$ de $i$ et $j$ tels que $0 \leq i < j < n$.
 
 # Q3
 voir lien Q2
