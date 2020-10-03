@@ -17,6 +17,11 @@
 
 #define sommes_p(i, j) (sommes_p[j] - sommes_p[i])
 
+typedef struct BST {
+	int BSTroot;
+	int **BSTtree;
+} BST;
+
 double *calculer_sommes(double *probabilites, long taille);
 double *lire_fichier(FILE* freqFile, long taille);
 void afficher_tableau(double* tableau, long taille);
@@ -39,9 +44,16 @@ double *calculer_sommes(double *probabilites, long taille) {
  * Lit le fichier et stocke les probabilités associées
  */
 double *lire_fichier(FILE* freqFile, long taille) {
+	long somme = 0;
+	long nombre;
 	double *probabilites = malloc(taille * sizeof(double));
 	for (long i = 0; i < taille; ++i) {
-		fscanf(freqFile, "%lf", &probabilites[i]);
+		fscanf(freqFile, "%ld", &nombre);
+		probabilites[i] = (double) nombre;
+		somme += nombre;
+	}
+	for (long i = 0; i < taille; ++i) {
+		probabilites[i] /= (double) somme;
 	}
 	return probabilites;
 }
