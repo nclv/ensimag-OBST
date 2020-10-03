@@ -15,6 +15,47 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define sommes_p(i, j) (sommes_p[j] - sommes_p[i])
+
+double *calculer_sommes(double *probabilites, long taille);
+double *lire_fichier(FILE* freqFile, long taille);
+void afficher_tableau(double* tableau, long taille);
+
+/**
+ * Calcule la somme des probabilités et utilise la macro
+ * sommes_p(i, j) pour calculer la somme partielle de i à j
+ */
+double *calculer_sommes(double *probabilites, long taille) {
+	double *sommes_p = malloc(taille * sizeof(double));
+	double somme = 0;
+	for (long i = 0; i < taille; ++i) {
+		somme += probabilites[i];
+		sommes_p[i] = somme;
+	}
+	return sommes_p;
+}
+
+/**
+ * Lit le fichier et stocke les probabilités associées
+ */
+double *lire_fichier(FILE* freqFile, long taille) {
+	double *probabilites = malloc(taille * sizeof(double));
+	for (long i = 0; i < taille; ++i) {
+		fscanf(freqFile, "%lf", &probabilites[i]);
+	}
+	return probabilites;
+}
+
+/**
+ * Affiche un tableau de double
+ */
+void afficher_tableau(double* tableau, long taille) {
+	for (long i = 0; i < taille - 1; i++) {
+		printf("%lf - ", tableau[i]);
+	}
+	printf("%lf\n", tableau[taille - 1]);
+}
+
 /**
  * Main function
  * \brief Main function
@@ -81,7 +122,15 @@ int main(int argc, char *argv[]) {
         exit(EXIT_FAILURE);
     }
 
-    // TO BE COMPLETED
+	//BEGIN
+	double* probabilites = lire_fichier(freqFile, n);
+	afficher_tableau(probabilites, n);
+	double* sommes_p = calculer_sommes(probabilites, n);
+	afficher_tableau(sommes_p, n);
+	printf("%lf\n", sommes_p(2, 3));
+	//END
+
+
     fclose(freqFile);
 
     return 0;
