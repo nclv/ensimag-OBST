@@ -20,6 +20,7 @@
 typedef struct BST {
 	int BSTroot;
 	int **BSTtree;
+	int **BSTcost;
 	long n;
 } BST;
 
@@ -66,8 +67,10 @@ struct BST *initialisation_BST(long taille) {
 	struct BST *optimal = malloc(sizeof(BST));
 	optimal->n = taille;
 	optimal->BSTtree = malloc(taille * sizeof(int *));
+	optimal->BSTcost = malloc(taille * sizeof(int *));
 	for (long i = 0; i < taille; i++) {
 		optimal->BSTtree[i] = malloc(2 * sizeof(int));
+		optimal->BSTcost[i] = malloc(taille * sizeof(int));
 	}
 	return optimal;
 }
@@ -77,6 +80,7 @@ struct BST *initialisation_BST(long taille) {
  */
 struct BST *optimalSearchTree(double *sommes_p, long taille) {
 	struct BST *optimal = initialisation_BST(taille);
+	
 	return optimal;
 }
 
