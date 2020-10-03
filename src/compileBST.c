@@ -20,6 +20,7 @@
 typedef struct BST {
 	int BSTroot;
 	int **BSTtree;
+	long n;
 } BST;
 
 double *calculer_sommes(double *probabilites, long taille);
@@ -43,7 +44,7 @@ double *calculer_sommes(double *probabilites, long taille) {
 /**
  * Lit le fichier et stocke les probabilités associées
  */
-double *lire_fichier(FILE* freqFile, long taille) {
+double *lire_fichier(FILE *freqFile, long taille) {
 	long somme = 0;
 	long nombre;
 	double *probabilites = malloc(taille * sizeof(double));
@@ -56,6 +57,27 @@ double *lire_fichier(FILE* freqFile, long taille) {
 		probabilites[i] /= (double) somme;
 	}
 	return probabilites;
+}
+
+/**
+ * Initialise le BST
+ */
+struct BST *initialisation_BST(long taille) {
+	struct BST *optimal = malloc(sizeof(BST));
+	optimal->n = taille;
+	optimal->BSTtree = malloc(taille * sizeof(int *));
+	for (long i = 0; i < taille; i++) {
+		optimal->BSTtree[i] = malloc(2 * sizeof(int));
+	}
+	return optimal;
+}
+
+/**
+ * Optimal Binary Search Tree
+ */
+struct BST *optimalSearchTree(double *sommes_p, long taille) {
+	struct BST *optimal = initialisation_BST(taille);
+	return optimal;
 }
 
 /**
