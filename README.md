@@ -38,7 +38,7 @@ assert(0 <= i && i < j && j < N);
 for (size_t i = 0; i < N; ++i) {
     /* Initialisation de la diagonale à 0 */
     somme_p(i, i) = 0;
-    for (size_t j = i + 1; j < n; ++j) {
+    for (size_t j = i + 1; j < N; ++j) {
 	    somme_p(i, j) = somme_p(i, j - 1) + probabilites[j];
     }
 }

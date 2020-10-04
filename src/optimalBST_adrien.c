@@ -1,18 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "optimalBST.h"
+#include "optimalBST_adrien.h"
 
-typedef struct BST {
-	int BSTroot;
-	int **BSTtree;
-	int **BSTcost;
-	size_t n;
-} BST;
-
-double *calculer_sommes(double *probabilites, size_t taille);
-double *lire_fichier(FILE* freqFile, size_t taille);
-void afficher_tableau(double* tableau, size_t taille);
 
 /**
  * Calcule la somme des probabilités et utilise la macro
@@ -75,8 +65,8 @@ struct BST *optimalSearchTree(double *sommes_p, size_t taille) {
  * Affiche un tableau de double
  */
 void afficher_tableau(double* tableau, size_t taille) {
-	for (size_t i = 0; i < taille - 1; i++) {
+	for (size_t i = 0; i < taille; ++i) {
 		printf("%lf - ", tableau[i]);
 	}
-	printf("%lf\n", tableau[taille - 1]);
+	printf("\n");
 }

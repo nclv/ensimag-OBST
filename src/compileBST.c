@@ -15,7 +15,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "optimalBST.h"
+#include "optimalBST_adrien.h"
+#include "optimalBST_nico.h"
 
 /**
  * Main function
@@ -87,11 +88,22 @@ int main(int argc, char *argv[]) {
 	//BEGIN
 	double* probabilites = lire_fichier(freqFile, n);
 	afficher_tableau(probabilites, n);
+
 	double* sommes_p = calculer_sommes(probabilites, n);
 	afficher_tableau(sommes_p, n);
 	printf("%lf\n", sommes_p(2, 3));
+
+    /**
+     * On rajoute une diagonale de zéros pour avoir C(i, i + 1) = p_i donc 
+     * on construit une matrice carrée triangulaire supérieure de taille n + 1. 
+     */
+    double *sommes_p_opt = calculer_sommes_opti(probabilites, n + 1);
+    afficher_tableau_opti(sommes_p_opt, n + 1);
 	//END
 
+    free(probabilites);
+    free(sommes_p);
+    free(sommes_p_opt);
     fclose(freqFile);
 
     return 0;

@@ -1,5 +1,0 @@
-optimalBST.c:21:9:calculer_sommes	48	static
-optimalBST.c:34:9:lire_fichier	96	static
-optimalBST.c:52:13:initialisation_BST	80	static
-optimalBST.c:67:13:optimalSearchTree	112	static
-optimalBST.c:77:6:afficher_tableau	64	static
