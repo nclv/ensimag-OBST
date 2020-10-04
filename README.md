@@ -21,26 +21,31 @@ Voir http://web.eecs.utk.edu/~leparker/Courses/CS581-spring14/Lectures/7-Jan-30-
 On effectue un pré-calcul $somme_p(i, j) = \sum_{l=i}^{j-1}p_l$ pour tout $0 \leq i < j < n$. On accède ensuite à la somme partielle des probabilités entre $i$ et $j$ par $\lstinline{sommes_p(i, j)}$.
 
 ```C
-#define N (10)
-
-/* 
-  * La valeur à l'emplacement (i, j) dans la matrice triangulaire supérieure se trouve 
-  * dans la mémoire à l'emplacement (i * (2 * (n - 1) - i + 1)) / 2 + j.
+/** 
+ * La valeur à l'emplacement (i, j) dans la matrice triangulaire supérieure se trouve 
+ * dans la mémoire à l'emplacement (i * (2 * (n - 1) - i + 1)) / 2 + j.
 */
-#define sommes_p(i, j) (somme_p[((i) * (2 * (N - 1) - (i) + 1)) / 2 + (j)])
+#define sommes_p(i, j, n) (sommes_p[((i) * (2 * ((n) - 1) - (i) + 1)) / 2 + (j)])
 
-/* On a n * (n + 1) / 2 éléments dans la matrice triangulaire supérieure avec la diagonale centrale nulle */
-double *sommes_p = malloc((N * (N + 1)) / 2 * sizeof(double));
 
-assert(0 <= i && i < j && j < N);
-
-/* Calcul des sommes des probabilités */
-for (size_t i = 0; i < N; ++i) {
-    /* Initialisation de la diagonale à 0 */
-    somme_p(i, i) = 0;
-    for (size_t j = i + 1; j < N; ++j) {
-	    somme_p(i, j) = somme_p(i, j - 1) + probabilites[j];
+/**
+ * Calcul des probabilitées et stockage dans un array 1d. Complexité spatiale et temporelle en O((n * (n + 1)) / 2).
+ *
+ * @param probabilites tableau des probabilités
+ * @param n taille de la matrice carrée générée, n == len(probabilites) + 1
+ */
+double *calculer_sommes_opti(double *probabilites, size_t n) {
+    /* On a n * (n + 1) / 2 éléments dans la matrice triangulaire supérieure avec la diagonale centrale nulle */
+    double *sommes_p = malloc((n * (n + 1)) / 2 * sizeof(double));
+    /* Calcul des sommes des probabilités */
+    for (size_t i = 0; i < n; ++i) {
+        /* Initialisation de la diagonale à p_0 */
+        sommes_p(i, i, n) = 0;
+        for (size_t j = i + 1; j < n; ++j) {
+            sommes_p(i, j, n) = sommes_p(i, j - 1, n) + probabilites[j - 1];
+        }
     }
+    return sommes_p;
 }
 ```
 ou

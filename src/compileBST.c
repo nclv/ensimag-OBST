@@ -97,8 +97,8 @@ int main(int argc, char *argv[]) {
      * On rajoute une diagonale de zéros pour avoir C(i, i + 1) = p_i donc 
      * on construit une matrice carrée triangulaire supérieure de taille n + 1. 
      */
-    double *sommes_p_opt = calculer_sommes_opti(probabilites, n + 1);
-    afficher_tableau_opti(sommes_p_opt, n + 1);
+    double *sommes_p_opt = calculer_sommes_all(probabilites, n + 1);
+    afficher_tableau_all(sommes_p_opt, n + 1);
 	//END
 
     free(probabilites);

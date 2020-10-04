@@ -17,7 +17,7 @@
  * @param probabilites tableau des probabilités
  * @param n taille de la matrice carrée générée, n == len(probabilites) + 1
  */
-double *calculer_sommes_opti(double *probabilites, size_t n) {
+double *calculer_sommes_all(double *probabilites, size_t n) {
     /* On a n * (n + 1) / 2 éléments dans la matrice triangulaire supérieure avec la diagonale centrale nulle */
     double *sommes_p = malloc((n * (n + 1)) / 2 * sizeof(double));
     /* Calcul des sommes des probabilités */
@@ -37,7 +37,7 @@ double *calculer_sommes_opti(double *probabilites, size_t n) {
  * @param array tableau de taille (n * (n + 1)) / 2
  * @param n taille de la matrice carrée
  */
-void afficher_tableau_opti(double* array, size_t n) {
+void afficher_tableau_all(double* array, size_t n) {
     size_t line = 1;
     size_t col = 0;
     for (size_t i = 0; i < (n * (n + 1)) / 2; ++i) {
