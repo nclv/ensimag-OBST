@@ -12,7 +12,7 @@
 
 
 /**
- * Calcul des probabilitées et stockage dans un array 1d
+ * Calcul des probabilitées et stockage dans un array 1d. Complexité spatiale et temporelle en O((n * (n + 1)) / 2).
  *
  * @param probabilites tableau des probabilités
  * @param n taille de la matrice carrée générée, n == len(probabilites) + 1
