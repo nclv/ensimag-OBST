@@ -15,84 +15,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define sommes_p(i, j) (sommes_p[j] - sommes_p[i])
-
-typedef struct BST {
-	int BSTroot;
-	int **BSTtree;
-	int **BSTcost;
-	long n;
-} BST;
-
-double *calculer_sommes(double *probabilites, long taille);
-double *lire_fichier(FILE* freqFile, long taille);
-void afficher_tableau(double* tableau, long taille);
-
-/**
- * Calcule la somme des probabilités et utilise la macro
- * sommes_p(i, j) pour calculer la somme partielle de i à j
- */
-double *calculer_sommes(double *probabilites, long taille) {
-	double *sommes_p = malloc(taille * sizeof(double));
-	double somme = 0;
-	for (long i = 0; i < taille; ++i) {
-		somme += probabilites[i];
-		sommes_p[i] = somme;
-	}
-	return sommes_p;
-}
-
-/**
- * Lit le fichier et stocke les probabilités associées
- */
-double *lire_fichier(FILE *freqFile, long taille) {
-	long somme = 0;
-	long nombre;
-	double *probabilites = malloc(taille * sizeof(double));
-	for (long i = 0; i < taille; ++i) {
-		fscanf(freqFile, "%ld", &nombre);
-		probabilites[i] = (double) nombre;
-		somme += nombre;
-	}
-	for (long i = 0; i < taille; ++i) {
-		probabilites[i] /= (double) somme;
-	}
-	return probabilites;
-}
-
-/**
- * Initialise le BST
- */
-struct BST *initialisation_BST(long taille) {
-	struct BST *optimal = malloc(sizeof(BST));
-	optimal->n = taille;
-	optimal->BSTtree = malloc(taille * sizeof(int *));
-	optimal->BSTcost = malloc(taille * sizeof(int *));
-	for (long i = 0; i < taille; i++) {
-		optimal->BSTtree[i] = malloc(2 * sizeof(int));
-		optimal->BSTcost[i] = malloc(taille * sizeof(int));
-	}
-	return optimal;
-}
-
-/**
- * Optimal Binary Search Tree
- */
-struct BST *optimalSearchTree(double *sommes_p, long taille) {
-	struct BST *optimal = initialisation_BST(taille);
-	
-	return optimal;
-}
-
-/**
- * Affiche un tableau de double
- */
-void afficher_tableau(double* tableau, long taille) {
-	for (long i = 0; i < taille - 1; i++) {
-		printf("%lf - ", tableau[i]);
-	}
-	printf("%lf\n", tableau[taille - 1]);
-}
+#include "optimalBST.h"
 
 /**
  * Main function
@@ -103,11 +26,11 @@ void afficher_tableau(double* tableau, long taille) {
  * \returns { 0 if succeeds and prints C code implementing an optimal ABR on stdout; exit code otherwise}
  */
 int main(int argc, char *argv[]) {
-    long n = 0;             // Number of elements in the dictionary
+    size_t n = 0;             // Number of elements in the dictionary
     FILE *freqFile = NULL;  // File that contains n positive integers defining the relative frequence of dictinary elements
 
     if (argc != 3) {
-        fprintf(stderr, "!!!!! Usage: ./compileBST n  originalFile !!!!!\n");
+        fprintf(stderr, "Usage: ./compileBST n  originalFile\n");
         exit(EXIT_FAILURE); /* indicate failure.*/
     }
 
@@ -115,7 +38,7 @@ int main(int argc, char *argv[]) {
         int codeRetour = EXIT_SUCCESS;
         char *posError;
         long resuLong;
-        n = atol(argv[1]);
+        n = (size_t)atol(argv[1]);
 
         assert(argc >= 2);
         // Conversion of argv[1] en long
@@ -125,7 +48,7 @@ int main(int argc, char *argv[]) {
             case EXIT_SUCCESS:
                 // Conversion du long en int
                 if (resuLong > 0) {
-                    n = (long)resuLong;
+                    n = (size_t)resuLong;
                     fprintf(stderr, "Number of elements in the dictionary: %ld\n", n);
                 } else {
                     (void)fprintf(stderr, "%s cannot be converted into a positive integer matching the number of elements in the dicionary.\n", argv[1]);
@@ -154,9 +77,10 @@ int main(int argc, char *argv[]) {
         if (codeRetour != EXIT_SUCCESS) return codeRetour;
     }
 
+    /* Ouverture sécurisée du fichier */
     freqFile = fopen(argv[2], "r");
     if (freqFile == NULL) {
-        fprintf(stderr, "!!!!! Error opening originalFile !!!!!\n");
+        fprintf(stderr, "ERROR: cannot open file '%s': %s\n", argv[2], strerror(errno));
         exit(EXIT_FAILURE);
     }
 
@@ -167,7 +91,6 @@ int main(int argc, char *argv[]) {
 	afficher_tableau(sommes_p, n);
 	printf("%lf\n", sommes_p(2, 3));
 	//END
-
 
     fclose(freqFile);
 

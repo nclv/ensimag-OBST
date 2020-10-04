@@ -9,6 +9,12 @@ https://github.com/titu1994/Optimal-Binary-Search-Tree/blob/master/Optimal%20Bin
 http://www.eecs.tufts.edu/~aloupis/comp150/projects/Cori_Jacoby_Alex_King_Final_Report_v2.pdf
 
 
+```bash
+make binary
+./bin/compileBST 10 frequences.txt
+make clean
+```
+
 # Q1
 Voir http://web.eecs.utk.edu/~leparker/Courses/CS581-spring14/Lectures/7-Jan-30-Opt-Binary-Search-no-answers.pdf et http://www.euroinformatica.ro/documentation/programming/!!!Algorithms_CORMEN!!!/DDU0091.html
 
