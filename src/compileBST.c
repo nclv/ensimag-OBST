@@ -78,12 +78,12 @@ static void bellman(double *c, double *probabilities, double *sommes_p, size_t n
             j = i + diagonal;
             double min = get_min(i, j, n, c);
             printf("min: %.2f\n", min);
-            if (diagonal > 1) {
+            if (i != 0) {
                 printf("somme_%li%li: %.2f\n", i, j, sommes_p(i, j));
                 c(i, j, n) = min + sommes_p(i, j);
             } else {
-                printf("somme_%li%li: %.2f\n", i, j, probabilities[i]);
-                c(i, j, n) = min + probabilities[i];
+                printf("somme_%li%li: %.2f\n", i, j, sommes_p[j - 1]);
+                c(i, j, n) = min + sommes_p[j - 1];
             }
             printf("c(%li, %li) = %.2f\n", i, j, c(i, j, n));
         }
