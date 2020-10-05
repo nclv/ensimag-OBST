@@ -52,12 +52,21 @@ static void lire_fichier(FILE *freqFile, size_t n,
  * @param j
  * @param n
  * @param c
- */ 
-static inline double get_min(size_t i, size_t j, size_t n, double *c) {
+ */
+static inline double get_min(int i, int j, int n, double *c) {
     double min = __FLT_MAX__;
-    for (size_t k = i; k < j; ++k) {
-        printf("c(%li, %li) + c(%li, %li) = %.2f + %.2f\n", i, k, k + 1, j, c(i, k, n), c(k + 1, j, n));
-        double temp = c(i, k, n) + c(k + 1, j, n);
+    for (int k = i; k <= j; ++k) {
+        printf("c(%i, %i) + c(%i, %i) = %.2f + %.2f\n", i, k - 1,
+               k + 1, j, c(i, k - 1, n), c(k + 1, j, n));
+        double temp = c(i, k - 1, n) + c(k + 1, j, n);
+        if (i == k) {
+            printf("On garde c(%i, %i) = %.2f\n", k + 1, j, c(k + 1, j, n));
+            temp = c(k + 1, j, n);
+        }
+        if (j == k) {
+            printf("On garde c(%i, %i) = %.2f\n", i, k - 1, c(i, k - 1, n));
+            temp = c(i, k - 1, n);
+        }
         if (temp < min) {
             min = temp;
         }
@@ -76,14 +85,15 @@ static void bellman(double *c, double *probabilities, double *sommes_p, size_t n
     for (size_t diagonal = 1; diagonal < n; ++diagonal) {
         for (size_t i = 0; i < n - diagonal; ++i) {
             j = i + diagonal;
-            double min = get_min(i, j, n, c);
+            double min = get_min((int)i, (int)j, (int)n, c);
             printf("min: %.2f\n", min);
             if (i != 0) {
-                printf("somme_%li%li: %.2f\n", i, j, sommes_p(i, j));
-                c(i, j, n) = min + sommes_p(i, j);
+                printf("somme_%li%li: %.2f\n", i, j, sommes_p(i - 1, j));
+                printf("%.2f - %.2f\n", sommes_p[j], sommes_p[i - 1]);
+                c(i, j, n) = min + sommes_p(i - 1, j);
             } else {
-                printf("somme_%li%li: %.2f\n", i, j, sommes_p[j - 1]);
-                c(i, j, n) = min + sommes_p[j - 1];
+                printf("somme_%li: %.2f\n", j, sommes_p[j]);
+                c(i, j, n) = min + sommes_p[j];
             }
             printf("c(%li, %li) = %.2f\n", i, j, c(i, j, n));
         }
@@ -156,7 +166,6 @@ int main(int argc, char *argv[]) {
         fprintf(stderr, "ERROR: cannot open file '%s': %s\n", argv[2], strerror(errno));
         exit(EXIT_FAILURE);
     }
-
 
     double *sommes_p = malloc(n * sizeof(double));
     double *probabilities = malloc(n * sizeof(double));
