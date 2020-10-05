@@ -16,7 +16,26 @@
 #include <string.h>
 
 #include "optimalBST_adrien.h"
-#include "optimalBST_nico.h"
+#include "partial_probabilities.h"
+#include "utils.h"
+
+/**
+ * Lit le fichier et stocke les probabilités associées
+ */
+static double *lire_fichier(FILE *freqFile, size_t n) {
+    long somme = 0;
+    long nombre;
+    double *probabilites = malloc(n * sizeof(double));
+    for (size_t i = 0; i < n; ++i) {
+        fscanf(freqFile, "%ld", &nombre);
+        probabilites[i] = (double)nombre;
+        somme += nombre;
+    }
+    for (size_t i = 0; i < n; ++i) {
+        probabilites[i] /= (double)somme;
+    }
+    return probabilites;
+}
 
 /**
  * Main function
@@ -27,7 +46,7 @@
  * \returns { 0 if succeeds and prints C code implementing an optimal ABR on stdout; exit code otherwise}
  */
 int main(int argc, char *argv[]) {
-    size_t n = 0;             // Number of elements in the dictionary
+    size_t n = 0;           // Number of elements in the dictionary
     FILE *freqFile = NULL;  // File that contains n positive integers defining the relative frequence of dictinary elements
 
     if (argc != 3) {
@@ -85,25 +104,27 @@ int main(int argc, char *argv[]) {
         exit(EXIT_FAILURE);
     }
 
-	//BEGIN
-	double* probabilites = lire_fichier(freqFile, n);
-	afficher_tableau(probabilites, n);
+    //BEGIN
+    double *probabilites = lire_fichier(freqFile, n);
+    printf("Probabilities: \n");
+    afficher_tableau(probabilites, n);
 
-	double* sommes_p = calculer_sommes(probabilites, n);
-	afficher_tableau(sommes_p, n);
-	printf("%lf\n", sommes_p(2, 3));
+    double *sommes_p = calculer_sommes(probabilites, n);
+    printf("Sommes partielles: \n");
+    afficher_tableau(sommes_p, n);
+    printf("%lf\n", sommes_p(2, 3));
 
     /**
      * On rajoute une diagonale de zéros pour avoir C(i, i + 1) = p_i donc 
      * on construit une matrice carrée triangulaire supérieure de taille n + 1. 
      */
-    double *sommes_p_opt = calculer_sommes_all(probabilites, n + 1);
-    afficher_tableau_all(sommes_p_opt, n + 1);
-	//END
+    // double *sommes_p_all = calculer_sommes_all(probabilites, n + 1);
+    // afficher_tableau_all(sommes_p_all, n + 1);
+    //END
 
     free(probabilites);
     free(sommes_p);
-    free(sommes_p_opt);
+    // free(sommes_p_all);
     fclose(freqFile);
 
     return 0;
