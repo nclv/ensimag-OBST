@@ -11,9 +11,11 @@ http://www.eecs.tufts.edu/~aloupis/comp150/projects/Cori_Jacoby_Alex_King_Final_
 
 ```bash
 make binary
-./bin/compileBST 10 frequences.txt
+./bin/compileBST 3 frequences.txt
 make clean
 ```
+
+`frequences.txt` contient `2 4 4`, `5 3 2`, `6 2 2`, `3 2 5`, `1 3 6`. `n` vaut le nombre d'éléments dans `frequences.txt`
 
 # Q1
 Voir http://web.eecs.utk.edu/~leparker/Courses/CS581-spring14/Lectures/7-Jan-30-Opt-Binary-Search-no-answers.pdf et http://www.euroinformatica.ro/documentation/programming/!!!Algorithms_CORMEN!!!/DDU0091.html

@@ -20,7 +20,7 @@ double *calculer_sommes_all(double *probabilites, size_t n) {
     double *sommes_p = malloc((n * (n + 1)) / 2 * sizeof(double));
     /* Calcul des sommes des probabilités */
     for (size_t i = 0; i < n; ++i) {
-        /* Initialisation de la diagonale à p_0 */
+        /* Initialisation de la diagonale à p_i */
         sommes_p_trig(i, i, n) = 0;
         for (size_t j = i + 1; j < n; ++j) {
             sommes_p_trig(i, j, n) = sommes_p_trig(i, j - 1, n) + probabilites[j - 1];

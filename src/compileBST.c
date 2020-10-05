@@ -20,14 +20,17 @@
 #include "utils.h"
 
 /**
+ * lire_fichier
  * Lit le fichier et stocke les probabilités ainsi que 
  * les probabilités partielles.
  * 
- * @param freqFile fichier contenant les fréquences
- * @param n nombre d'éléments dans le dictionnaire
+ * \param freqFile fichier contenant les fréquences
+ * \param n nombre d'éléments dans le dictionnaire
  */
 static void lire_fichier(FILE *freqFile, size_t n,
                          double *probabilities, double *sommes_p) {
+    assert(n > 0 && "ERROR: n must be > 0");
+    assert(freqFile != NULL && "ERROR: frequencies file is a void pointer");
     long nombre;
     long somme = 0;
     for (size_t i = 0; i < n; ++i) {
@@ -39,6 +42,51 @@ static void lire_fichier(FILE *freqFile, size_t n,
     for (size_t i = 0; i < n; ++i) {
         probabilities[i] /= (double)somme;
         sommes_p[i] /= (double)somme;
+    }
+}
+
+/**
+ * Renvoie la valeur de k qui minimise c(i, k) - c(k + 1, j), i <= k < j
+ * 
+ * @param i
+ * @param j
+ * @param n
+ * @param c
+ */ 
+static inline double get_min(size_t i, size_t j, size_t n, double *c) {
+    double min = __FLT_MAX__;
+    for (size_t k = i; k < j; ++k) {
+        printf("c(%li, %li) + c(%li, %li) = %.2f + %.2f\n", i, k, k + 1, j, c(i, k, n), c(k + 1, j, n));
+        double temp = c(i, k, n) + c(k + 1, j, n);
+        if (temp < min) {
+            min = temp;
+        }
+    }
+    return min;
+}
+
+static void bellman(double *c, double *probabilities, double *sommes_p, size_t n) {
+    /* Initialisation de la diagonale à p_0 */
+    for (size_t i = 0; i < n; ++i) {
+        c(i, i, n) = probabilities[i];
+        printf("c(%li, %li) = %.2f\n", i, i, c(i, i, n));
+    }
+    size_t j;
+    /* Calcul des sommes des probabilités pour i > j */
+    for (size_t diagonal = 1; diagonal < n; ++diagonal) {
+        for (size_t i = 0; i < n - diagonal; ++i) {
+            j = i + diagonal;
+            double min = get_min(i, j, n, c);
+            printf("min: %.2f\n", min);
+            if (diagonal > 1) {
+                printf("somme_%li%li: %.2f\n", i, j, sommes_p(i, j));
+                c(i, j, n) = min + sommes_p(i, j);
+            } else {
+                printf("somme_%li%li: %.2f\n", i, j, probabilities[i]);
+                c(i, j, n) = min + probabilities[i];
+            }
+            printf("c(%li, %li) = %.2f\n", i, j, c(i, j, n));
+        }
     }
 }
 
@@ -111,17 +159,25 @@ int main(int argc, char *argv[]) {
 
 
     double *sommes_p = malloc(n * sizeof(double));
-    double *probabilites = malloc(n * sizeof(double));
+    double *probabilities = malloc(n * sizeof(double));
 
-    lire_fichier(freqFile, n, probabilites, sommes_p);
+    lire_fichier(freqFile, n, probabilities, sommes_p);
     printf("Probabilities: \n");
-    afficher_tableau(probabilites, n);
-    // double *sommes_p = calculer_sommes(probabilites, n);
+    afficher_tableau(probabilities, n);
+    // double *sommes_p = calculer_sommes(probabilities, n);
     printf("Sommes partielles: \n");
     afficher_tableau(sommes_p, n);
     // printf("%lf\n", sommes_p(2, 3));
 
     // int abr[n][2];
+    double *c = malloc((n * (n + 1)) / 2 * sizeof(double));
+    // double *c = calculer_sommes_all(probabilities, n);
+    // printf("Matrice C:\n");
+    // afficher_tableau_all(c, n);
+    bellman(c, probabilities, sommes_p, n);
+    printf("Matrice C:\n");
+    afficher_tableau_all(c, n);
+    printf("Profondeur minimale: %f\n", c(0, n - 1, n));
 
     /**
      * On rajoute une diagonale de zéros pour avoir C(i, i + 1) = p_i donc 
@@ -134,7 +190,7 @@ int main(int argc, char *argv[]) {
     printf("static int BSTtree[<max_values>][2] = {");
     printf(" };\n");
 
-    free(probabilites);
+    free(probabilities);
     free(sommes_p);
     // free(sommes_p_all);
     fclose(freqFile);
