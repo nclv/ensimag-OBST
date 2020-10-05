@@ -1,4 +1,4 @@
-#include "optimalBST_adrien.h"
+#include "optimalBST.h"
 
 #include <stdio.h>
 #include <stdlib.h>

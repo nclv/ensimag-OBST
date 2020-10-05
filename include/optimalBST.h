@@ -1,5 +1,5 @@
-#ifndef optimalBST_adrien_H_
-#define optimalBST_adrien_H_
+#ifndef optimalBST_H_
+#define optimalBST_H_
 
 #include <stdio.h>
 

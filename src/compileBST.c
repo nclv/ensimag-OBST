@@ -15,26 +15,31 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "optimalBST_adrien.h"
+#include "optimalBST.h"
 #include "partial_probabilities.h"
 #include "utils.h"
 
 /**
- * Lit le fichier et stocke les probabilités associées
+ * Lit le fichier et stocke les probabilités ainsi que 
+ * les probabilités partielles.
+ * 
+ * @param freqFile fichier contenant les fréquences
+ * @param n nombre d'éléments dans le dictionnaire
  */
-static double *lire_fichier(FILE *freqFile, size_t n) {
-    long somme = 0;
+static void lire_fichier(FILE *freqFile, size_t n,
+                         double *probabilities, double *sommes_p) {
     long nombre;
-    double *probabilites = malloc(n * sizeof(double));
+    long somme = 0;
     for (size_t i = 0; i < n; ++i) {
         fscanf(freqFile, "%ld", &nombre);
-        probabilites[i] = (double)nombre;
+        probabilities[i] = (double)nombre;
         somme += nombre;
+        sommes_p[i] = (double)somme;
     }
     for (size_t i = 0; i < n; ++i) {
-        probabilites[i] /= (double)somme;
+        probabilities[i] /= (double)somme;
+        sommes_p[i] /= (double)somme;
     }
-    return probabilites;
 }
 
 /**
@@ -104,15 +109,19 @@ int main(int argc, char *argv[]) {
         exit(EXIT_FAILURE);
     }
 
-    //BEGIN
-    double *probabilites = lire_fichier(freqFile, n);
+
+    double *sommes_p = malloc(n * sizeof(double));
+    double *probabilites = malloc(n * sizeof(double));
+
+    lire_fichier(freqFile, n, probabilites, sommes_p);
     printf("Probabilities: \n");
     afficher_tableau(probabilites, n);
-
-    double *sommes_p = calculer_sommes(probabilites, n);
+    // double *sommes_p = calculer_sommes(probabilites, n);
     printf("Sommes partielles: \n");
     afficher_tableau(sommes_p, n);
-    printf("%lf\n", sommes_p(2, 3));
+    // printf("%lf\n", sommes_p(2, 3));
+
+    // int abr[n][2];
 
     /**
      * On rajoute une diagonale de zéros pour avoir C(i, i + 1) = p_i donc 
@@ -120,12 +129,15 @@ int main(int argc, char *argv[]) {
      */
     // double *sommes_p_all = calculer_sommes_all(probabilites, n + 1);
     // afficher_tableau_all(sommes_p_all, n + 1);
-    //END
+
+    printf("static int BSTroot = ...;\n");
+    printf("static int BSTtree[<max_values>][2] = {");
+    printf(" };\n");
 
     free(probabilites);
     free(sommes_p);
     // free(sommes_p_all);
     fclose(freqFile);
 
-    return 0;
+    return EXIT_SUCCESS;
 }
