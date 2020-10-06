@@ -1,2 +1,3 @@
 src/utils.c:9:6:afficher_tableau	64	static
-src/utils.c:22:6:afficher_tableau_all	96	static
+src/utils.c:22:6:afficher_tableau_trig_double	96	static
+src/utils.c:44:6:afficher_tableau_trig_int	96	static

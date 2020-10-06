@@ -1,2 +1,2 @@
-src/partial_probabilities.c:18:9:calculer_sommes_all	48	static
-src/partial_probabilities.c:43:9:calculer_sommes	48	static
+src/partial_probabilities.c:19:9:calculer_sommes_all	48	static
+src/partial_probabilities.c:45:9:calculer_sommes	48	static

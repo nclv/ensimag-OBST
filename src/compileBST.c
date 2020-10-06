@@ -19,13 +19,15 @@
 #include "partial_probabilities.h"
 #include "utils.h"
 
+#define c(i, j, n) (c[((i) * (2 * ((n)-1) - (i) + 1)) / 2 + (j)])
+#define r(i, j, n) (r[((i) * (2 * ((n)-1) - (i) + 1)) / 2 + (j)])
+
 /**
- * lire_fichier
- * Lit le fichier et stocke les probabilités ainsi que 
- * les probabilités partielles.
- * 
+ * \fn static void lire_fichier(FILE *freqFile, size_t n,
+                         double *probabilities, double *sommes_p)
+ * \brief Lit le fichier et stocke les probabilités ainsi que les probabilités partielles.
  * \param freqFile fichier contenant les fréquences
- * \param n nombre d'éléments dans le dictionnaire
+ * \param n nombre d'éléments dans le dictionnaire, n >= 0
  */
 static void lire_fichier(FILE *freqFile, size_t n,
                          double *probabilities, double *sommes_p) {
@@ -46,57 +48,112 @@ static void lire_fichier(FILE *freqFile, size_t n,
 }
 
 /**
- * Renvoie la valeur de k qui minimise c(i, k) - c(k + 1, j), i <= k < j
- * 
- * @param i
- * @param j
- * @param n
- * @param c
+ * \fn static inline double get_min(int i, int j, int n, double *c)
+ * \brief On cherche la racine optimale du sous-arbre des éléments entre i et j
+ * \param i i >= 0
+ * \param j j > i
+ * \param n nombre d'éléments à stocker dans l'arbre, n >= 0
+ * \param c matrice triangulaire supérieure contenant (n * (n + 1)) / 2 éléments
+ * \return Renvoie la valeur qui minimise c(i, k) - c(k + 1, j), i <= k < j
  */
-static inline double get_min(int i, int j, int n, double *c) {
+static inline double get_min(int i, int j, int n, double *c, int *r) {
     double min = __FLT_MAX__;
-    for (int k = i; k <= j; ++k) {
-        printf("c(%i, %i) + c(%i, %i) = %.2f + %.2f\n", i, k - 1,
-               k + 1, j, c(i, k - 1, n), c(k + 1, j, n));
-        double temp = c(i, k - 1, n) + c(k + 1, j, n);
-        if (i == k) {
-            printf("On garde c(%i, %i) = %.2f\n", k + 1, j, c(k + 1, j, n));
-            temp = c(k + 1, j, n);
-        }
-        if (j == k) {
-            printf("On garde c(%i, %i) = %.2f\n", i, k - 1, c(i, k - 1, n));
-            temp = c(i, k - 1, n);
-        }
+    double temp;
+    int argmin = r(i, j - 1, n);
+    // on utilise des int car k - 1 peut être négatif
+    // Knuth, 1971
+    // for (int k = i; k <= j; ++k) {
+    for (int k = argmin; k <= r(i + 1, j, n); ++k) {
+        // printf("c(%i, %i) + c(%i, %i) = %.2f + %.2f\n", i, k - 1,
+        //        k + 1, j, c(i, k - 1, n), c(k + 1, j, n));
+        /** 
+         * Attention aux cas limites pour i == k et j == k
+         * si i == k: temp = c(k + 1, j, n)
+         * si j == k: temp = c(i, k - 1, n)
+         */
+        temp = ((i < k) ? c(i, k - 1, n) : 0) + ((j > k) ? c(k + 1, j, n) : 0);
         if (temp < min) {
             min = temp;
+            argmin = k;
         }
     }
+    r(i, j, n) = argmin;
     return min;
 }
 
-static void bellman(double *c, double *probabilities, double *sommes_p, size_t n) {
-    /* Initialisation de la diagonale à p_0 */
+/**
+ * \fn static void bellman(double *c, double *probabilities, double *sommes_p, size_t n)
+ * \brief Remplie la matrice triangulaire supérieure des coefficients, c, avec l'algorithme de Bellman
+ * \param c matrice triangulaire supérieure des coûts contenant (n * (n + 1)) / 2 éléments
+ * \param r matrice triangulaire supérieure des racines contenant (n * (n + 1)) / 2 éléments
+ * \param probabilities array contenant n probabilités
+ * \param sommes_p array contenant n sommes partielles
+ * \param n nombre d'éléments à stocker dans l'arbre
+ */
+static void bellman(double *c, int *r, double *probabilities, double *sommes_p, size_t n) {
+    /* Initialisation de la diagonale inférieure c(i, i) avec les p_i */
     for (size_t i = 0; i < n; ++i) {
         c(i, i, n) = probabilities[i];
-        printf("c(%li, %li) = %.2f\n", i, i, c(i, i, n));
+        r(i, i, n) = (int)i;
+        // printf("c(%li, %li) = %.2f\n", i, i, c(i, i, n));
     }
+
+    /** 
+     * Calcul des coefficients c(i, j) pour 0 <= i < j < n 
+     * On itère diagonale par diagonale en commençant par celle directement
+     * au dessus de la diagonale des probabilités.
+     * 
+     */
     size_t j;
-    /* Calcul des sommes des probabilités pour i > j */
+    double min;
     for (size_t diagonal = 1; diagonal < n; ++diagonal) {
         for (size_t i = 0; i < n - diagonal; ++i) {
             j = i + diagonal;
-            double min = get_min((int)i, (int)j, (int)n, c);
-            printf("min: %.2f\n", min);
-            if (i != 0) {
-                printf("somme_%li%li: %.2f\n", i, j, sommes_p(i - 1, j));
-                printf("%.2f - %.2f\n", sommes_p[j], sommes_p[i - 1]);
+            /* Récupération de la valeur qui minimise c(i, k) - c(k + 1, j), i <= k < j */
+            min = get_min((int)i, (int)j, (int)n, c, r);
+            // printf("min: %.2f\n", min);
+            /** 
+             * Notre précalcul des sommes partielles des probabilités nous oblige à 
+             * considérer 2 cas, en effet sommes_p[j] contient la sommes des probabilités 
+             * de p_0 à p_j inclu:
+             * 
+             * si i == 0 (ie. on veut la somme de 0 inclu à j inclu): on prend sommes_p[j]
+             * sinon: on prend sommes_p[j] - sommes_p[i - 1] (ici avec une macro)
+             */
+            if (i > 0) {
+                // printf("sommes_p[%li] - sommes_p[%li]: %.2f\n", j, i, sommes_p(i - 1, j));
+                // printf("= %.2f - %.2f\n", sommes_p[j], sommes_p[i - 1]);
                 c(i, j, n) = min + sommes_p(i - 1, j);
             } else {
-                printf("somme_%li: %.2f\n", j, sommes_p[j]);
+                // printf("sommes_p[%li]: %.2f\n", j, sommes_p[j]);
                 c(i, j, n) = min + sommes_p[j];
             }
-            printf("c(%li, %li) = %.2f\n", i, j, c(i, j, n));
+            // printf("c(%li, %li) = %.2f\n", i, j, c(i, j, n));
         }
+    }
+}
+
+/**
+ * build_bst
+ * \fn void build_bst(int i, int j, int n, int *r, int (*bst)[2])
+ * \brief Construction récusive du BST
+ * \param i premier élement de la liste des racines
+ * \param j dernier élement de la liste des racines
+ * \param n nombre d'éléments à stocker dans l'arbre
+ * \param r liste des racines
+ * \param bst le Binary Search Tree
+ */
+void build_bst(int i, int j, int n, int *r, int (*bst)[2]) {
+    int root = r(i, j, n);
+    // printf("root: %i\ni: %d, j: %d\n", root, i, j);
+    if (i < root) {
+        bst[root][0] = r(i, root - 1, n);  // Fils gauche
+        build_bst(i, root - 1, n, r, bst);
+    }
+
+    if (root < j) {
+        bst[root][1] = r(root + 1, j, n);  // Fils droite
+        build_bst(root + 1, j, n, r, bst);
     }
 }
 
@@ -169,38 +226,60 @@ int main(int argc, char *argv[]) {
 
     double *sommes_p = malloc(n * sizeof(double));
     double *probabilities = malloc(n * sizeof(double));
-
     lire_fichier(freqFile, n, probabilities, sommes_p);
+
     printf("Probabilities: \n");
     afficher_tableau(probabilities, n);
     // double *sommes_p = calculer_sommes(probabilities, n);
     printf("Sommes partielles: \n");
     afficher_tableau(sommes_p, n);
-    // printf("%lf\n", sommes_p(2, 3));
-
-    // int abr[n][2];
-    double *c = malloc((n * (n + 1)) / 2 * sizeof(double));
-    // double *c = calculer_sommes_all(probabilities, n);
-    // printf("Matrice C:\n");
-    // afficher_tableau_all(c, n);
-    bellman(c, probabilities, sommes_p, n);
-    printf("Matrice C:\n");
-    afficher_tableau_all(c, n);
-    printf("Profondeur minimale: %f\n", c(0, n - 1, n));
 
     /**
+     * Autre manière de stocker les sommes partielles
      * On rajoute une diagonale de zéros pour avoir C(i, i + 1) = p_i donc 
      * on construit une matrice carrée triangulaire supérieure de taille n + 1. 
      */
     // double *sommes_p_all = calculer_sommes_all(probabilites, n + 1);
-    // afficher_tableau_all(sommes_p_all, n + 1);
+    // afficher_tableau_trig_double(sommes_p_all, n + 1);
 
-    printf("static int BSTroot = ...;\n");
-    printf("static int BSTtree[<max_values>][2] = {");
+    /**
+     * On choisit de stocker seulement les coefficients utiles au calcul:
+     * c est une matrice triangulaire supérieure de doubles et de même pour r,
+     * la matrice contenant les racines.
+     * La première diagonale contient les p_i. On ne stocke pas la diagonale 
+     * c(i, i) (notation de l'énoncé) ne contenant que des zéros.
+     * 
+     * Ainsi, dans notre programme, la diagonale c(i, i) contient les p_i.
+     */
+    double *c = malloc((n * (n + 1)) / 2 * sizeof(double));
+    int *r = malloc((n * (n + 1)) / 2 * sizeof(int));
+    bellman(c, r, probabilities, sommes_p, n);
+    printf("Matrice des coûts c:\n");
+    afficher_tableau_trig_double(c, n);
+    printf("Profondeur minimale: %f\n", c(0, n - 1, n));
+    printf("Matrice des racines r:\n");
+    afficher_tableau_trig_int(r, n);
+
+    int bst[n][2];
+    // Mise des coefficients à -1
+    memset(bst, -1, 2 * n * sizeof(int));
+
+    build_bst(0, (int)n - 1, (int)n, r, bst);  // Création de l'arbre
+
+    printf("static int BSTroot = %d;\n", r(0, n - 1, n));
+    printf("static int BSTtree[%ld][2] = {", n);
+    for (size_t i = 0; i < n; i++) {
+        printf(" {%d, %d}", bst[i][0], bst[i][1]);
+        if (i != n - 1) {
+            printf(",\n");
+        }
+    }
     printf(" };\n");
 
     free(probabilities);
     free(sommes_p);
+    free(c);
+    free(r);
     // free(sommes_p_all);
     fclose(freqFile);
 
