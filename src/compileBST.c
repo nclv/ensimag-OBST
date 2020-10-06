@@ -270,7 +270,7 @@ int main(int argc, char *argv[]) {
     printf("static int BSTtree[%ld][2] = {", n);
     for (size_t i = 0; i < n; i++) {
         printf(" {%d, %d}", bst[i][0], bst[i][1]);
-        if (i != n - 1) {
+        if (i < n - 1) {
             printf(",\n");
         }
     }
