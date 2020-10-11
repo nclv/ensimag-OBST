@@ -88,3 +88,5 @@ Pour stocker notre arbre binaire, on utilise un tableau `bst[n][2]`. On ne stock
 Dès que l’on s’éloigne de la racine, une ligne de cache ne contient que des noeuds qui ne sont pas sur le même chemin racine-feuille. On a donc besoin d’un défaut de cache par noeud de l’arbre pour un coût total de : $Q(n) = h = O(log_2(n))$.
 
 The algorithm has poor cache performance. To see this consider the computation of the d-th diagonal. In computing the entries of the d-th diagonal all the entries of C to _the left and below the d-th diagonal are accessed._
+
+Time complexity = n(n + 1)(n + 2)/6
