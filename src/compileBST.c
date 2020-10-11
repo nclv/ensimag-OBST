@@ -104,8 +104,8 @@ static void bellman(double *c, int *r, double *probabilities, double *sommes_p, 
      * au dessus de la diagonale des probabilités.
      * 
      */
-    size_t j;
     double min;
+    size_t j;
     for (size_t diagonal = 1; diagonal < n; ++diagonal) {
         for (size_t i = 0; i < n - diagonal; ++i) {
             j = i + diagonal;
@@ -129,6 +129,38 @@ static void bellman(double *c, int *r, double *probabilities, double *sommes_p, 
                 c(i, j, n) = min + sommes_p[j];
             }
             // printf("c(%li, %li) = %.2f\n", i, j, c(i, j, n));
+        }
+    }
+}
+
+static void bellman_2(double *c, int *r, double *probabilities, double *sommes_p, size_t n) {
+    double min;
+    for (int i = n - 1; i >= 0; --i) {
+        c(i, i, n) = probabilities[i];
+        r(i, i, n) = i;
+        for (int j = i + 1; j < n; ++j) {
+            min = get_min(i, j, n, c, r);
+            if (i > 0) {
+                c(i, j, n) = min + sommes_p(i - 1, j);
+            } else {
+                c(i, j, n) = min + sommes_p[j];
+            }
+        }
+    }
+}
+
+static void bellman_3(double *c, int *r, double *probabilities, double *sommes_p, size_t n) {
+    double min;
+    for (int j = 1; j < n; --j) {
+        c(j, j, n) = probabilities[j];
+        r(j, j, n) = j;
+        for (int i = j - 1; j >= 0; --j) {
+            min = get_min(i, j, n, c, r);
+            if (i > 0) {
+                c(i, j, n) = min + sommes_p(i - 1, j);
+            } else {
+                c(i, j, n) = min + sommes_p[j];
+            }
         }
     }
 }
@@ -253,14 +285,72 @@ int main(int argc, char *argv[]) {
      */
     double *c = malloc((n * (n + 1)) / 2 * sizeof(double));
     int *r = malloc((n * (n + 1)) / 2 * sizeof(int));
+    int bst[n][2];
+
+    /* Test bellman */
+
+    printf("\nTest bellman dik:\n");
     bellman(c, r, probabilities, sommes_p, n);
+
     printf("Matrice des coûts c:\n");
     afficher_tableau_trig_double(c, n);
     printf("Profondeur minimale: %f\n", c(0, n - 1, n));
     printf("Matrice des racines r:\n");
     afficher_tableau_trig_int(r, n);
 
-    int bst[n][2];
+    // Mise des coefficients à -1
+    memset(bst, -1, 2 * n * sizeof(int));
+
+    build_bst(0, (int)n - 1, (int)n, r, bst);  // Création de l'arbre
+
+    printf("static int BSTroot = %d;\n", r(0, n - 1, n));
+    printf("static int BSTtree[%ld][2] = {", n);
+    for (size_t i = 0; i < n; i++) {
+        printf(" {%d, %d}", bst[i][0], bst[i][1]);
+        if (i < n - 1) {
+            printf(",\n");
+        }
+    }
+    printf(" };\n");
+
+    /* Test bellman 2 */
+
+    printf("\nTest bellman ijk:\n");
+    bellman_2(c, r, probabilities, sommes_p, n);
+
+    printf("Matrice des coûts c:\n");
+    afficher_tableau_trig_double(c, n);
+    printf("Profondeur minimale: %f\n", c(0, n - 1, n));
+    printf("Matrice des racines r:\n");
+    afficher_tableau_trig_int(r, n);
+
+    // Mise des coefficients à -1
+    memset(bst, -1, 2 * n * sizeof(int));
+
+    build_bst(0, (int)n - 1, (int)n, r, bst);  // Création de l'arbre
+
+    printf("static int BSTroot = %d;\n", r(0, n - 1, n));
+    printf("static int BSTtree[%ld][2] = {", n);
+    for (size_t i = 0; i < n; i++) {
+        printf(" {%d, %d}", bst[i][0], bst[i][1]);
+        if (i < n - 1) {
+            printf(",\n");
+        }
+    }
+    printf(" };\n");
+
+    /* Test bellman 3 */
+
+    printf("\nTest bellman jik:\n");
+
+    bellman_3(c, r, probabilities, sommes_p, n);
+
+    printf("Matrice des coûts c:\n");
+    afficher_tableau_trig_double(c, n);
+    printf("Profondeur minimale: %f\n", c(0, n - 1, n));
+    printf("Matrice des racines r:\n");
+    afficher_tableau_trig_int(r, n);
+
     // Mise des coefficients à -1
     memset(bst, -1, 2 * n * sizeof(int));
 

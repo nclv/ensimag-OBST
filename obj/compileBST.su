@@ -1,2 +1,2 @@
-src/compileBST.c:146:6:build_bst	80	static
-src/compileBST.c:168:5:main	176	dynamic
+src/compileBST.c:178:6:build_bst	80	static
+src/compileBST.c:200:5:main	240	dynamic

@@ -76,3 +76,15 @@ Il y a un total de $n^2$ sous-problèmes (ou du moins en $\Theta(n^2)$) et chaqu
 # Q3
 voir les lien Q2
 voir ce que le résultat permet https://www.student.cs.uwaterloo.ca/~cs466/Old_courses/F03/3-optimal_search_trees.pdf
+
+
+---
+
+Nous considérons maintenant la recherche dans un arbre binaire équilibré contenant
+$n$ éléments et de hauteur $O(log_2(n))$.
+
+Pour stocker notre arbre binaire, on utilise un tableau `bst[n][2]`. On ne stocke pas la racine, obtenu en `C(0, n - 1)`, et on stocke les fils gauche et droit du noeud stocké en `bst[i]` dans les cases `bst[?][0]` et `bst[?][1]`.
+
+Dès que l’on s’éloigne de la racine, une ligne de cache ne contient que des noeuds qui ne sont pas sur le même chemin racine-feuille. On a donc besoin d’un défaut de cache par noeud de l’arbre pour un coût total de : $Q(n) = h = O(log_2(n))$.
+
+The algorithm has poor cache performance. To see this consider the computation of the d-th diagonal. In computing the entries of the d-th diagonal all the entries of C to _the left and below the d-th diagonal are accessed._
