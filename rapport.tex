@@ -47,9 +47,9 @@
 
 	Une autre façon de voir notre problème est de considérer le total de $n^2$ sous-problèmes (ou du moins $\Theta(n^2)$). Sachant que chaque sous-problème est de complexité $\Theta(n)$ si l'on suppose que tous les sous-problèmes sont déjà résolus, on obtient une complexité totale en $\Theta(n^3)$.
 
-	RESTRICTION DE KNUTH !!!
+	Maintenant, on peut restreindre le choix de $k$ en sachant que $r(i, j - 1) \leq r(i, j) \leq r(i + 1, j)$, montrons-le. 
 
-	L'équation de Bellman devient $$C(i, j) = min_{r(i, j -1) \leq k \leq r(i + 1, j)} C(i, k) + C(k + 1, j) + \sum \limits_{l = i}^{j - 1} p_l$$.
+	L'équation de Bellman devient $$C(i, j) = min_{r(i, j - 1) \leq k \leq r(i + 1, j)} C(i, k) + C(k + 1, j) + \sum \limits_{l = i}^{j - 1} p_l$$.
 
 	Grâce à cette restriction, $\sum \limits_{i = 1}^{n} \sum \limits_{j = 1}^{n} r(i + 1, j) - r(i, j - 1) + 1 \leq n^2 + \sum \limits_{i = 1}^{n} r(i, n) + \sum \limits_{j = 1}^{n} r(n + 1, j) = O(n^2)$.
 
@@ -78,9 +78,13 @@
 	Exemple : soit 
 
 	\subsection{Complexités}
-Nombre d'opérations en pire cas : 
-Place mémoire requise : $2\frac{n(n+1)}{2} + 2n = O(n^2)$.
-Nombre de défauts de cache : $Z >> n(n+1) + 2n : O(\frac{n}{L})$. $Z << n : \frac{2n}{L} + $
+Sachant que la construction de l'arbre complet depuis $r$ demande un espace mémoire de $2n$, notre algorithme utilise un espace mémoire de $2\frac{n(n+1)}{2} + 2n = O(n^2)$. \par\leavevmode\par 
+Le pire des cas se produit quand la profondeur de l'arbre est égale au nombre de sommets de l'arbre, autrement dit quand on a $r(i, j - 1) - r(i + 1, j) + 1$ est maximal. \par\leavevmode\par 
+Concernant le nombre de défauts de cache :
+\begin{enumerate}
+	\item Si le cache est assez grand pour contenir tous les espaces de stockage, c'est-à-dire si $Z \gg n(n+1) + 2n$ alors $Q(n, L, Z) = \frac{n(n+1) + 2n}{L} = O(\frac{n^2}{L})$. 
+	\item Si le cache est trop petit pour contenir un espace de taille $n$, c'est-à-dire si $Z \ll n$ alors on a déjà $\frac{n}{L}$ défauts de cache pour écrire la diagonale principale.
+\end{enumerate} 
 
 
 
