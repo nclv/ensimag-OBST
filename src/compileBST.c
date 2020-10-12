@@ -15,7 +15,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "optimalBST.h"
 #include "partial_probabilities.h"
 #include "utils.h"
 
@@ -151,10 +150,10 @@ static void bellman_2(double *c, int *r, double *probabilities, double *sommes_p
 
 static void bellman_3(double *c, int *r, double *probabilities, double *sommes_p, size_t n) {
     double min;
-    for (int j = 1; j < n; --j) {
+    for (int j = 0; j < n; ++j) {
         c(j, j, n) = probabilities[j];
         r(j, j, n) = j;
-        for (int i = j - 1; j >= 0; --j) {
+        for (int i = j - 1; i >= 0; --i) {
             min = get_min(i, j, n, c, r);
             if (i > 0) {
                 c(i, j, n) = min + sommes_p(i - 1, j);
@@ -190,6 +189,45 @@ void build_bst(int i, int j, int n, int *r, int (*bst)[2]) {
 }
 
 /**
+ * print_bst
+ * \fn void print_bst(int n, int *r, int (*bst)[2])
+ * \brief Affichage du BST
+ * \param n nombre d'éléments à stocker dans l'arbre
+ * \param r liste des racines
+ * \param bst le Binary Search Tree
+ */
+void print_bst(int n, int *r, int (*bst)[2]) {
+    printf("static int BSTroot = %d;\n", r(0, n - 1, n));
+    printf("static int BSTtree[%ld][2] = {\n", n);
+    for (size_t i = 0; i < n; i++) {
+        printf("{%d, %d}", bst[i][0], bst[i][1]);
+        if (i < n - 1) {
+            printf(", \n");
+        }
+    }
+    printf(" };\n");
+}
+
+void run_bellman_fn(double *c, int *r,
+                    double *probabilities, double *sommes_p,
+                    size_t n, int (*bst)[2],
+                    void (*bellman_fn)(double *, int *, double *, double *, size_t)) {
+    (*bellman_fn)(c, r, probabilities, sommes_p, n);
+
+    // printf("Matrice des coûts c:\n");
+    // afficher_tableau_trig_double(c, n);
+    // printf("Profondeur minimale: %f\n", c(0, n - 1, n));
+    // printf("Matrice des racines r:\n");
+    // afficher_tableau_trig_int(r, n);
+
+    // Mise des coefficients du BST à -1
+    memset(bst, -1, 2 * n * sizeof(int));
+
+    build_bst(0, (int)n - 1, (int)n, r, bst);  // Création de l'arbre
+    print_bst(n, r, bst);
+}
+
+/**
  * Main function
  * \brief Main function
  * \param argc  A count of the number of command-line arguments
@@ -221,7 +259,7 @@ int main(int argc, char *argv[]) {
                 // Conversion du long en int
                 if (resuLong > 0) {
                     n = (size_t)resuLong;
-                    fprintf(stderr, "Number of elements in the dictionary: %ld\n", n);
+                    // fprintf(stderr, "Number of elements in the dictionary: %ld\n", n);
                 } else {
                     (void)fprintf(stderr, "%s cannot be converted into a positive integer matching the number of elements in the dicionary.\n", argv[1]);
                     codeRetour = EXIT_FAILURE;
@@ -260,11 +298,11 @@ int main(int argc, char *argv[]) {
     double *probabilities = malloc(n * sizeof(double));
     lire_fichier(freqFile, n, probabilities, sommes_p);
 
-    printf("Probabilities: \n");
-    afficher_tableau(probabilities, n);
-    // double *sommes_p = calculer_sommes(probabilities, n);
-    printf("Sommes partielles: \n");
-    afficher_tableau(sommes_p, n);
+    // printf("Probabilities: \n");
+    // afficher_tableau(probabilities, n);
+    // // double *sommes_p = calculer_sommes(probabilities, n);
+    // printf("Sommes partielles: \n");
+    // afficher_tableau(sommes_p, n);
 
     /**
      * Autre manière de stocker les sommes partielles
@@ -288,89 +326,22 @@ int main(int argc, char *argv[]) {
     int bst[n][2];
 
     /* Test bellman */
-
-    printf("\nTest bellman dik:\n");
-    bellman(c, r, probabilities, sommes_p, n);
-
-    printf("Matrice des coûts c:\n");
-    afficher_tableau_trig_double(c, n);
-    printf("Profondeur minimale: %f\n", c(0, n - 1, n));
-    printf("Matrice des racines r:\n");
-    afficher_tableau_trig_int(r, n);
-
-    // Mise des coefficients à -1
-    memset(bst, -1, 2 * n * sizeof(int));
-
-    build_bst(0, (int)n - 1, (int)n, r, bst);  // Création de l'arbre
-
-    printf("static int BSTroot = %d;\n", r(0, n - 1, n));
-    printf("static int BSTtree[%ld][2] = {", n);
-    for (size_t i = 0; i < n; i++) {
-        printf(" {%d, %d}", bst[i][0], bst[i][1]);
-        if (i < n - 1) {
-            printf(",\n");
-        }
-    }
-    printf(" };\n");
+    // printf("\nTest bellman dik:\n");
+    // run_bellman_fn(c, r, probabilities, sommes_p, n, bst, bellman);
 
     /* Test bellman 2 */
-
-    printf("\nTest bellman ijk:\n");
-    bellman_2(c, r, probabilities, sommes_p, n);
-
-    printf("Matrice des coûts c:\n");
-    afficher_tableau_trig_double(c, n);
-    printf("Profondeur minimale: %f\n", c(0, n - 1, n));
-    printf("Matrice des racines r:\n");
-    afficher_tableau_trig_int(r, n);
-
-    // Mise des coefficients à -1
-    memset(bst, -1, 2 * n * sizeof(int));
-
-    build_bst(0, (int)n - 1, (int)n, r, bst);  // Création de l'arbre
-
-    printf("static int BSTroot = %d;\n", r(0, n - 1, n));
-    printf("static int BSTtree[%ld][2] = {", n);
-    for (size_t i = 0; i < n; i++) {
-        printf(" {%d, %d}", bst[i][0], bst[i][1]);
-        if (i < n - 1) {
-            printf(",\n");
-        }
-    }
-    printf(" };\n");
+    // printf("\nTest bellman ijk:\n");
+    // run_bellman_fn(c, r, probabilities, sommes_p, n, bst, bellman_2);
 
     /* Test bellman 3 */
-
-    printf("\nTest bellman jik:\n");
-
-    bellman_3(c, r, probabilities, sommes_p, n);
-
-    printf("Matrice des coûts c:\n");
-    afficher_tableau_trig_double(c, n);
-    printf("Profondeur minimale: %f\n", c(0, n - 1, n));
-    printf("Matrice des racines r:\n");
-    afficher_tableau_trig_int(r, n);
-
-    // Mise des coefficients à -1
-    memset(bst, -1, 2 * n * sizeof(int));
-
-    build_bst(0, (int)n - 1, (int)n, r, bst);  // Création de l'arbre
-
-    printf("static int BSTroot = %d;\n", r(0, n - 1, n));
-    printf("static int BSTtree[%ld][2] = {", n);
-    for (size_t i = 0; i < n; i++) {
-        printf(" {%d, %d}", bst[i][0], bst[i][1]);
-        if (i < n - 1) {
-            printf(",\n");
-        }
-    }
-    printf(" };\n");
+    // printf("\nTest bellman jik:\n");
+    run_bellman_fn(c, r, probabilities, sommes_p, n, bst, bellman_3);
 
     free(probabilities);
     free(sommes_p);
+    // free(sommes_p_all);
     free(c);
     free(r);
-    // free(sommes_p_all);
     fclose(freqFile);
 
     return EXIT_SUCCESS;
