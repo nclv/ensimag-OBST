@@ -75,6 +75,7 @@ static inline double get_min(int i, int j, int n, double *c, int *r) {
         if (temp < min) {
             min = temp;
             argmin = k;
+            printf("min: %.17f, r: %i\n", min, argmin);
         }
     }
     r(i, j, n) = argmin;
@@ -349,10 +350,22 @@ int main(int argc, char *argv[]) {
     };
     printf("\nTest bellman dik:\n");
     bellman_fn_execution_time(&bellman_args, bellman);
-    printf("\nTest bellman ijk:\n");
-    bellman_fn_execution_time(&bellman_args, bellman_2);
-    printf("\nTest bellman jik:\n");
-    bellman_fn_execution_time(&bellman_args, bellman_3);
+    // printf("\nTest bellman ijk:\n");
+    // bellman_fn_execution_time(&bellman_args, bellman_2);
+    // printf("\nTest bellman jik:\n");
+    // bellman_fn_execution_time(&bellman_args, bellman_3);
+
+    // printf("Matrice des coûts c:\n");
+    // afficher_tableau_trig_double(c, n);
+    // printf("Profondeur minimale: %f\n", c(0, n - 1, n));
+    // printf("Matrice des racines r:\n");
+    // afficher_tableau_trig_int(r, n);
+
+    // // Mise des coefficients du BST à -1
+    // memset(bst, -1, 2 * n * sizeof(int));
+
+    // build_bst(0, (int)n - 1, (int)n, r, bst);  // Création de l'arbre
+    // print_bst(n, r, bst);
 
     /* Test bellman */
     // printf("\nTest bellman dik:\n");
