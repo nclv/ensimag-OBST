@@ -4,15 +4,15 @@
 #include <stdlib.h>
 
 typedef struct bellman_args {
-    double *c;
+    long double *c;
     int *r;
-    double *probabilities;
-    double *sommes_p;
+    long double *probabilities;
+    long double *sommes_p;
     size_t n;
 } t_bellman_args;
 
 extern void bellman_fn_execution_time(t_bellman_args *bellman_args,
-                                      void (*bellman_fn)(double *, int *,
-                                                         double *, double *, size_t));
+                                      void (*bellman_fn)(long double *, int *,
+                                                         long double *, long double *, size_t));
 
 #endif

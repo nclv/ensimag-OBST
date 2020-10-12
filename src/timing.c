@@ -4,8 +4,8 @@
 #include <time.h>
 
 void bellman_fn_execution_time(t_bellman_args *bellman_args,
-                               void (*bellman_fn)(double *, int *,
-                                                  double *, double *, size_t)) {
+                               void (*bellman_fn)(long double *, int *,
+                                                  long double *, long double *, size_t)) {
     static clock_t start, end;
     static double cpu_time_used;
 
