@@ -90,3 +90,11 @@ Dès que l’on s’éloigne de la racine, une ligne de cache ne contient que de
 The algorithm has poor cache performance. To see this consider the computation of the d-th diagonal. In computing the entries of the d-th diagonal all the entries of C to _the left and below the d-th diagonal are accessed._
 
 Time complexity = n(n + 1)(n + 2)/6
+
+---
+
+```bash
+gnuplot
+gnuplot> set key outside
+gnuplot> plot for [col=1:3] 'benchmarks/benchmark6.perf' using 0:col with lines
+```

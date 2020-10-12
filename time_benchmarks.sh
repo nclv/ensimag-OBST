@@ -23,7 +23,7 @@ do
     do
         ./bin/compileBST $n "$input_file" >> "$output_file"
     done
-    echo 
+    echo
 done
 
 exit 0
