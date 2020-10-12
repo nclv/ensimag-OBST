@@ -16,5 +16,6 @@ void bellman_fn_execution_time(t_bellman_args *bellman_args,
     end = clock();
     cpu_time_used = ((double)(end - start)) / CLOCKS_PER_SEC;
 
-    printf("CPU time used: %lf\n", cpu_time_used);
+    // printf("CPU time used: %lf\n", cpu_time_used);
+    printf("%lf ", cpu_time_used);
 }
