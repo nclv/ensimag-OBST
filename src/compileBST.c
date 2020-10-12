@@ -16,6 +16,7 @@
 #include <string.h>
 
 #include "partial_probabilities.h"
+#include "timing.h"
 #include "utils.h"
 
 #define c(i, j, n) (c[((i) * (2 * ((n)-1) - (i) + 1)) / 2 + (j)])
@@ -208,6 +209,18 @@ void print_bst(int n, int *r, int (*bst)[2]) {
     printf(" };\n");
 }
 
+/**
+ * run_bellman_fn
+ * \fn void run_bellman_fn(double *c, int *r, double *probabilities, double *sommes_p, size_t n, int (*bst)[2], void (*bellman_fn)(double *, int *, double *, double *, size_t))
+ * \brief Calcul du BST avec la fonction bellman_fn
+ * \param c matrice triangulaire supérieure des coûts contenant (n * (n + 1)) / 2 éléments
+ * \param r matrice triangulaire supérieure des racines contenant (n * (n + 1)) / 2 éléments
+ * \param probabilities array contenant n probabilités
+ * \param sommes_p array contenant n sommes partielles
+ * \param n nombre d'éléments à stocker dans l'arbre
+ * \param bst le Binary Search Tree
+ * \param bellman_fn fonction calculant la matrice des racines et des coûts
+ */
 void run_bellman_fn(double *c, int *r,
                     double *probabilities, double *sommes_p,
                     size_t n, int (*bst)[2],
@@ -325,6 +338,22 @@ int main(int argc, char *argv[]) {
     int *r = malloc((n * (n + 1)) / 2 * sizeof(int));
     int bst[n][2];
 
+
+    /* Time benchmarks */
+    t_bellman_args bellman_args = {
+        .c=c,
+        .r=r,
+        .probabilities=probabilities,
+        .sommes_p=sommes_p,
+        .n=n,
+    };
+    printf("\nTest bellman dik:\n");
+    bellman_fn_execution_time(&bellman_args, bellman);
+    printf("\nTest bellman ijk:\n");
+    bellman_fn_execution_time(&bellman_args, bellman_2);
+    printf("\nTest bellman jik:\n");
+    bellman_fn_execution_time(&bellman_args, bellman_3);
+
     /* Test bellman */
     // printf("\nTest bellman dik:\n");
     // run_bellman_fn(c, r, probabilities, sommes_p, n, bst, bellman);
@@ -335,7 +364,7 @@ int main(int argc, char *argv[]) {
 
     /* Test bellman 3 */
     // printf("\nTest bellman jik:\n");
-    run_bellman_fn(c, r, probabilities, sommes_p, n, bst, bellman_3);
+    // run_bellman_fn(c, r, probabilities, sommes_p, n, bst, bellman_3);
 
     free(probabilities);
     free(sommes_p);
