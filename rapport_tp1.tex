@@ -37,7 +37,7 @@ Pour ne pas subir le calcul des sommes pendant la construction de l'arbre, on ch
 
 Sachant que les temps asymptotiques en itératif et récursif sont les mêmes, on choisit d'employer une méthode itérative, notamment pour éviter une surchage de pile en mémoire. \par\leavevmode\par
 
-	Le principe de notre algorithme se présente comme suit : on définit deux tableaux auxiliaires, notés $c$ et $r$, de taille $\frac{n(n+1)}{2}$ pour stocker les coûts et racines des sous-arbres optimaux. Le calcul se fait en ascendant, en partant de la construction des plus petits sous-arbres pour construire les plus grands. La matrice des coûts -- présentée ci-dessous -- est triangulaire supérieure, contient sur sa diagonale pricipale les coûts des sous-arbres optimaux dont le nombre de sommets est égal à $1$. On rappelle que notre programme ne stocke essentiellement que la partie triangulaire supérieure, on dispose d'un itérateur pour parcourir tous ces coefficients. \par\leavevmode\par
+	Le principe de notre algorithme se présente comme suit : on définit deux tableaux auxiliaires, notés $c$ et $r$, de taille $\frac{n(n+1)}{2}$ pour stocker les coûts et racines des sous-arbres optimaux. Le calcul se fait en ascendant, en partant de la construction des plus petits sous-arbres pour construire les plus grands. La matrice des coûts -- présentée ci-dessous -- est triangulaire supérieure, contient sur sa diagonale pricipale les coûts des sous-arbres optimaux dont le nombre de sommets est égal à $1$. On rappelle que notre programme ne stocke que la partie triangulaire supérieure, on dispose d'un itérateur pour parcourir tous ces coefficients. \par\leavevmode\par
 	\[
 		\left(
 		\begin{array}{ccccc}
@@ -62,7 +62,7 @@ Sachant que les temps asymptotiques en itératif et récursif sont les mêmes, o
 
 	Une autre façon de voir notre problème est de considérer le total de $n^2$ sous-problèmes (ou du moins $\Theta(n^2)$). Sachant que chaque sous-problème est de complexité $\Theta(n)$ si l'on suppose que tous les sous-problèmes sont déjà résolus, on obtient une complexité totale en $\Theta(n^3)$.
 
-	Maintenant, on peut restreindre le choix de $k$ en sachant que $r(i, j - 1) \leq r(i, j) \leq r(i + 1, j)$, montrons-le. 
+	Maintenant, on peut restreindre le choix de $k$ en sachant que $r(i, j - 1) \leq r(i, j) \leq r(i + 1, j)$. 
 
 	L'équation de Bellman devient $$C(i, j) = min_{r(i, j - 1) \leq k \leq r(i + 1, j)} C(i, k) + C(k + 1, j) + \sum \limits_{l = i}^{j - 1} p_l$$.
 
@@ -84,7 +84,7 @@ Sachant que les temps asymptotiques en itératif et récursif sont les mêmes, o
 	$$= 2n + \sum_{d=1}^{n - 1} (n - d + 2)n = 2n + n^2(n - 1) -n\frac{n(n - 1)}{2} + 2n(n - 1) = O(n^3)$$
 	On en déduit un nombre d'opérations de $O(n^3)$
   \subsection{Place mémoire requise\,: }
-Sachant que la construction de l'arbre complet depuis $r$ demande un espace mémoire de $2n$, notre algorithme utilise un espace mémoire de $2\frac{n(n+1)}{2} + 2n = O(n^2)$. \par\leavevmode\par 
+Sachant que la construction de l'arbre complet depuis $r$ demande un espace mémoire de $2n$, notre algorithme utilise un espace mémoire de $2\frac{n(n+1)}{2} + n + 2n = O(n^2)$. \par\leavevmode\par 
 
   \subsection{Nombre de défauts de cache sur le modèle CO\,: }
 

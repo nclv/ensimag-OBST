@@ -1,0 +1,17 @@
+
+ Performance counter stats for './bin/compileBST 5000 benchmarks/benchmark6.in':
+
+            922,40 msec task-clock                #    0,996 CPUs utilized          
+     2 766 638 172      cycles                    #    2,999 GHz                      (37,25%)
+     1 626 261 036      instructions              #    0,59  insn per cycle           (54,12%)
+        89 836 553      cache-references          #   97,394 M/sec                    (66,71%)
+        17 072 724      cache-misses              #   19,004 % of all cache refs      (83,56%)
+       272 906 116      L1-dcache-loads           #  295,865 M/sec                    (82,58%)
+       113 847 300      L1-dcache-load-misses     #   41,72% of all L1-dcache hits    (32,88%)
+
+       0,925795496 seconds time elapsed
+
+       0,799050000 seconds user
+       0,124475000 seconds sys
+
+

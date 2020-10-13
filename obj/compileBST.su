@@ -1,5 +1,5 @@
-src/compileBST.c:94:13:bellman	128	static
+src/compileBST.c:153:13:bellman_3	144	static
 src/compileBST.c:179:6:build_bst	80	static
 src/compileBST.c:201:6:print_bst	64	static
 src/compileBST.c:225:6:run_bellman_fn	64	static
-src/compileBST.c:252:5:main	192	dynamic
+src/compileBST.c:252:5:main	144	static

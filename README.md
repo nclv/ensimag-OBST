@@ -94,7 +94,15 @@ Time complexity = n(n + 1)(n + 2)/6
 ---
 
 ```bash
-gnuplot
+$gnuplot
 gnuplot> set key outside
 gnuplot> plot for [col=1:3] 'benchmarks/benchmark6.perf' using 0:col with lines
+```
+
+```bash
+$lscpu > hardware
+$valgrind --tool=cachegrind --log-file=valgrind-cachegrindijk.txt ./bin/compileBST 5000 benchmarks/benchmark6.in
+$sudo perf stat -e task-clock,cycles,instructions,cache-references,cache-misses,L1-dcache-loads,L1-dcache-load-misses ./bin/compileBST 5000 benchmarks/benchmark6.in
+$sudo perf record -e cache-misses ./bin/compileBST 5000 benchmarks/benchmark6.in
+$sudo perf report --stdio --header
 ```
