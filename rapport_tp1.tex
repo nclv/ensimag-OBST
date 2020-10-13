@@ -1,0 +1,171 @@
+\documentclass[a4paper, 10pt, french]{article}
+% Préambule; packages qui peuvent être utiles
+   \RequirePackage[T1]{fontenc}        % Ce package pourrit les pdf...
+   \RequirePackage{babel,indentfirst}  % Pour les césures correctes,
+                                       % et pour indenter au début de chaque paragraphe
+   \RequirePackage[utf8]{inputenc}   % Pour pouvoir utiliser directement les accents
+                                     % et autres caractères français
+   % \RequirePackage{lmodern,tgpagella} % Police de caractères
+   \textwidth 17cm \textheight 25cm \oddsidemargin -0.24cm % Définition taille de la page
+   \evensidemargin -1.24cm \topskip 0cm \headheight -1.5cm % Définition des marges
+   \RequirePackage{latexsym}                  % Symboles
+   \RequirePackage{amsmath}                   % Symboles mathématiques
+   \RequirePackage{tikz}   % Pour faire des schémas
+   \RequirePackage{graphicx} % Pour inclure des images
+   \RequirePackage{listings} % pour mettre des listings
+% Fin Préambule; package qui peuvent être utiles
+
+\title{Rapport de TP 4MMAOD : Génération d'ABR optimal}
+\author{
+ARGENTO Adrien Groupe 1 
+\\ VINCENT Nicolas Groupe 1 
+}
+
+\begin{document}
+
+\maketitle
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Principe de notre  programme}
+Pour ne pas subir le calcul des sommes pendant la construction de l'arbre, on choisit d'utiliser un tableau auxiliaire $sp$ de $n$ cases, stockant les sommes partielles des $p_i$. Autrement dit, chaque case $i$ de $sp$ contient les sommes de $j = 0$ à $i$ des $p_j$. Ce pré-travail coûte $O(n)$ opérations et $O(n)$ espace de stockage mémoire. Ainsi, notre somme se calcule en $O(1)$ opérations	 comme suit : $$\sum \limits_{l = i}^{j - 1} p_l =
+	\left\{
+		\begin{array}{ll}
+		    sp[j - 1] - sp[i - 1] & \mbox{si } i \neq 0 \\
+		    sp[j - 1] & \mbox{sinon.}
+		\end{array}
+	\right.$$
+
+Sachant que les temps asymptotiques en itératif et récursif sont les mêmes, on choisit d'employer une méthode itérative, notamment pour éviter une surchage de pile en mémoire. \par\leavevmode\par
+
+	Le principe de notre algorithme se présente comme suit : on définit deux tableaux auxiliaires, notés $c$ et $r$, de taille $\frac{n(n+1)}{2}$ pour stocker les coûts et racines des sous-arbres optimaux. Le calcul se fait en ascendant, en partant de la construction des plus petits sous-arbres pour construire les plus grands. La matrice des coûts -- présentée ci-dessous -- est triangulaire supérieure, contient sur sa diagonale pricipale les coûts des sous-arbres optimaux dont le nombre de sommets est égal à $1$. On rappelle que notre programme ne stocke essentiellement que la partie triangulaire supérieure, on dispose d'un itérateur pour parcourir tous ces coefficients. \par\leavevmode\par
+	\[
+		\left(
+		\begin{array}{ccccc}
+		  c_{0,1} & c_{0,2} & \dots & \dots & c_{0,n-1} \\
+		  &       c_{1,2}       &\dots & \dots  & c_{1,n-1} \\
+		  &               & \ddots     &   & \vdots           \\
+		  & \text{\huge0} &    &  \ddots   & \vdots       \\
+		  &               &   &   & c_{n-2,n-1}
+		\end{array}
+		\right)
+	\]  
+	\par\leavevmode\par
+	Parallèlement, on dispose d'une matrice $r$ construite de la même manière que $c$. L'idée de l'algorithme repose sur la construction pas à pas des diagonales de la matrice, débutant par la diagonale principale. Chaque diagonale représente des chaînes de sommets de longueur $j - i$ et dépend essentiellement des diagonales inférieures. Au fur et à mesure du calcul des coûts, on actualise $r$ en déterminant le sommet du sous-arbre optimal qui minimise le coût, tout en appliquant bien évidemment la restriction de Knuth. Ainsi, la profondeur moyenne de l'arbre complet est $c_{0,n-1}$, soit la diagonale la plus haute.
+	Ainsi, on dispose de $r$ contenant l'intégralité des racines des sous-arbres minimisant le coût, on peut construire l'arbre en parcourant dans le sens inverse, de la diagonale la plus haute jusqu'à la diagonale principale.
+
+	Nous proposerons en ouverture un algorithme plus performant en cache.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Analyse du coût théorique}
+	Pour notre programme, comme on a $\frac{n(n-1)}{2}$ possibilités pour les couples $(i, j)$ avec $0 \leq i < j < n$, l'espace requis est en $\Theta(n^2)$.
+
+	Par ailleurs, on sait que tout sous-arbre d'un ABR optimal est un ABR optimal. Ainsi, on choisit de prendre comme racine tous les noeuds de l'ABR en faisant varier $k$ de $i$ à $j - 1$. Lorsque l'on choisit que le $k$-ème noeud est la racine, on calcule récursivement le coût optimal de $i$ à $k - 1$ et de $k + 1$ à $j$. Comme l'on choisit $k$ parmi $j - i$ possibilités, la complexité temporelle est en $\Theta(n^3)$
+
+	Une autre façon de voir notre problème est de considérer le total de $n^2$ sous-problèmes (ou du moins $\Theta(n^2)$). Sachant que chaque sous-problème est de complexité $\Theta(n)$ si l'on suppose que tous les sous-problèmes sont déjà résolus, on obtient une complexité totale en $\Theta(n^3)$.
+
+	Maintenant, on peut restreindre le choix de $k$ en sachant que $r(i, j - 1) \leq r(i, j) \leq r(i + 1, j)$, montrons-le. 
+
+	L'équation de Bellman devient $$C(i, j) = min_{r(i, j - 1) \leq k \leq r(i + 1, j)} C(i, k) + C(k + 1, j) + \sum \limits_{l = i}^{j - 1} p_l$$.
+
+	Grâce à cette restriction, $\sum \limits_{i = 1}^{n} \sum \limits_{j = 1}^{n} r(i + 1, j) - r(i, j - 1) + 1 \leq n^2 + \sum \limits_{i = 1}^{n} r(i, n) + \sum \limits_{j = 1}^{n} r(n + 1, j) = O(n^2)$.
+
+	Le temps de calcul devient $O(n^2)$.
+  \subsection{Nombre  d'opérations en pire cas\,: }
+	Le pire des cas se produit quand la profondeur de l'arbre est égal au nombre de sommets, c'est-à-dire quand on a un {\em unbalanced tree}. Le coût de recherche est en $O(n)$ et la structure de l'arbre se résume à une {\em linked list}. 
+	Déterminons le nombre d'opérations en pire cas en prenant comme indicateurs le nombre de comparaisons, le nombre d'affectations, le nombre d'additions et le nombre de soutractions :
+	\begin{enumerate}
+		\item Initialisation de la diagonale principale : $2$ affectations $n$ fois.
+		\item Boucle $1...n - 1$ : pas d'opérations.
+		\item Boucle $0...n - d + 1$ : 6 affectactions (3 dans la boucle, 3 dans {\em get\_min}), 2 additions et 1 instruction conditionnelle.
+		\item Boucle $r(i + 1, j, n)...r(i, j - 1, n)$ : 2 affectactions et 3 instructions conditionnelles.
+	\end{enumerate}
+	Le programme itératif contient la boucle $r(i + 1, j, n)...r(i, j - 1, n)$ imbriquée dans $0...n - d + 1$ imbriquée dans $1...n - 1$ correspondant à la somme :
+	$$T(n) = \sum_{i=0}^{n - 1} 2 + \sum_{d=1}^{n - 1} \sum_{i = 0}^{n - d + 1} 9\sum_{k=r(i + 1, i + d, n)}^{r(i, i + d - 1, n)} 5 = 2n + \sum_{d=1}^{n - 1} \sum_{i = 0}^{n - d + 1} 45 (r(i, i + d - 1, n) - r(i + 1, i + d, n) + 1)$$ 
+	$$\leq 2n + \sum_{d=1}^{n - 1} \sum_{i = 0}^{n - d + 1} 45n$$%\mbox{comme r(i, i + d - 1, n) - r(i + 1, i + d, n) + 1 \leq n}$$
+	$$= 2n + \sum_{d=1}^{n - 1} (n - d + 2)n = 2n + n^2(n - 1) -n\frac{n(n - 1)}{2} + 2n(n - 1) = O(n^3)$$
+	On en déduit un nombre d'opérations de $O(n^3)$
+  \subsection{Place mémoire requise\,: }
+Sachant que la construction de l'arbre complet depuis $r$ demande un espace mémoire de $2n$, notre algorithme utilise un espace mémoire de $2\frac{n(n+1)}{2} + 2n = O(n^2)$. \par\leavevmode\par 
+
+  \subsection{Nombre de défauts de cache sur le modèle CO\,: }
+
+Concernant le nombre de défauts de cache :
+\begin{enumerate}
+	\item Si le cache est assez grand pour contenir tous les espaces de stockage, c'est-à-dire si $Z \gg n(n+1) + 2n$ alors $Q(n, L, Z) = \frac{n(n+1) + 2n}{L} = O(\frac{n^2}{L})$. 
+	\item Si le cache est trop petit pour contenir un espace de taille $n$, c'est-à-dire si $Z \ll n$ alors on a déjà $\frac{n}{L}$ défauts de cache pour écrire la diagonale principale.
+\end{enumerate} 
+    \paragraph{Justification\,: }
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Compte rendu d'expérimentation (2 points)}
+  \subsection{Conditions expérimentales}
+     {\em Décrire les conditions permettant la reproductibilité des mesures: on demande la description
+      de la machine et la méthode utilisée pour mesurer le temps.
+     }
+
+    \subsubsection{Description synthétique de la machine\,:} 
+      {\em indiquer ici le  processeur et sa fréquence, la mémoire, le système d'exploitation. 
+       Préciser aussi si la machine était monopolisée pour un test, ou notamment si 
+       d'autres processus ou utilisateurs étaient en cours d'exécution. 
+      } 
+
+    \subsubsection{Méthode utilisée pour les mesures de temps\,: } 
+      {\em préciser ici  comment les mesures de temps ont été effectuées (fonction appelée) et l'unité de temps; en particulier, 
+       préciser comment les 5 exécutions pour chaque test ont été faites (par exemple si le même test est fait 5 fois de suite, ou si les tests sont alternés entre
+       les mesures, ou exécutés en concurrence etc). 
+      }
+
+  \subsection{Mesures expérimentales}
+    {\em Compléter le tableau suivant par les temps d'exécution mesurés pour chacun des 6 benchmarks imposés
+              (temps minimum, maximum et moyen sur 5 exécutions)
+    }
+
+    \begin{figure}[h]
+      \begin{center}
+        \begin{tabular}{|l||r||r|r|r||}
+          \hline
+          \hline
+            & coût         & temps     & temps   & temps \\
+            & du patch     & min       & max     & moyen \\
+          \hline
+          \hline
+            benchmark1 &      &     &     &     \\
+          \hline
+            benchmark2 &      &     &     &     \\
+          \hline
+            benchmark3 &      &     &     &     \\
+          \hline
+            benchmark4 &      &     &     &     \\
+          \hline
+            benchmark5 &      &     &     &     \\
+          \hline
+            benchmark6 &      &     &     &     \\
+          \hline
+          \hline
+        \end{tabular}
+        \caption{Mesures des temps minimum, maximum et moyen de 5 exécutions pour les 6 benchmarks.}
+        \label{table-temps}
+      \end{center}
+    \end{figure}
+
+\subsection{Analyse des résultats expérimentaux}
+{\em Donner  une réponse justifiée  à la question\,: 
+              les  temps mesurés correspondent ils  à votre analyse théorique (nombre d’opérations et défauts de cache) ?
+}
+
+
+\end{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Question bonus\,: programme {\tt mystere.c}(2 points)}
+\subsection{Que fait le programme mystère et dans quel but? (1.5 point)}
+{\em Dire brièvement ce que fait le programme mystere et quel est l'impact lors de l'exécution 
+(i.e. lors de recherches avec le dictionnaire) de ce post-traitement.}
+
+\subsection{Qu'en pensez-vous? (0.5 point) } 
+{\em Répondre à l'argumentation en justifiant : soit que le programme mystere est (presque) optimal (justifier les hypothèses) ; soit qu'il n'est pas optimal en 
+justifiant comment faire encore mieux.
+}
+
+%% Fin mise au format
+
