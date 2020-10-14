@@ -1,18 +1,18 @@
 #ifndef _TIMING_
 #define _TIMING_
 
-#include <stdlib.h>
+#include <stdint.h>
 
 typedef struct bellman_args {
-    long double *c;
+    uint64_t *c;
     int *r;
-    long double *probabilities;
-    long double *sommes_p;
-    size_t n;
+    uint64_t *probabilities;
+    uint64_t *sommes_p;
+    int n;
 } t_bellman_args;
 
 extern void bellman_fn_execution_time(t_bellman_args *bellman_args,
-                                      void (*bellman_fn)(long double *, int *,
-                                                         long double *, long double *, size_t));
+                                      void (*bellman_fn)(uint64_t *, int *,
+                                                         uint64_t *, uint64_t *, int));
 
 #endif
