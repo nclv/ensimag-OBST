@@ -53,7 +53,7 @@ Le principe de notre algorithme se présente comme suit : on définit deux table
 Parallèlement, on dispose d'une matrice $r$ construite de la même manière que $c$. L'idée de l'algorithme repose sur la construction pas à pas des diagonales de la matrice, débutant par la diagonale principale. Chaque diagonale représente des chaînes de sommets de longueur $j - i$ et dépend essentiellement des diagonales inférieures. Au fur et à mesure du calcul des coûts, on actualise $r$ en déterminant le sommet du sous-arbre optimal qui minimise le coût, tout en appliquant bien évidemment la restriction de Knuth. Ainsi, la profondeur moyenne de l'arbre complet est $c_{0,n-1}$, soit la diagonale la plus haute.
 Ainsi, on dispose de $r$ contenant l'intégralité des racines des sous-arbres minimisant le coût, on peut construire l'arbre en parcourant dans le sens inverse, de la diagonale la plus haute jusqu'à la diagonale principale.
 
-L'utilisation du cache peut être améliorée. En effet, au lieu de boucler en commençant par la diagonale, $(d, i, k)$, on peut itérer en $(i, j, k)$ ou $(j, i, k)$. La boucle commençant par $i$ conduit naturellement à moins de défauts de caches, le language C ayant une structure mémoire en {\em row-major}. Nous avons implémenté et comparé ces trois algorithmes.
+L'utilisation du cache peut être améliorée. En effet, au lieu de boucler en commençant par la diagonale, $(d, i, k)$, on peut itérer en $(i, j, k)$ ou $(j, i, k)$. La boucle commençant par $i$ conduit naturellement à moins de défauts de caches, le language C ayant une structure mémoire en {\em row-major}. Nous avons implémenté et comparé ces trois algorithmes CO.
 
 Nous proposerons en ouverture un algorithme plus performant en cache.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -98,6 +98,10 @@ Sachant que la construction de l'arbre complet depuis $r$ demande un espace mém
 
 \subsection{Nombre de défauts de cache sur le modèle CO\,: }
 
+L'algorithme de Bellman (d, i, k) a des très mauvaises localités temporelle et spatiale. On mesure en effet 38.2\% de miss-rate sur le cache L1. Prenons le calcul de la $d$-ième diagonale. Toutes les entrées précalculées à gauche et en dessous de la diagonale $d$ sont accédées.
+
+Les deux autres algorithmes calculent les sous-problèmes en suivant un ordre différent. Pour l'algorithme (i, j, k), les sous-problèmes de la forme $i \ldots j$ sont résolus avant ceux de la forme $i - 1 \ldots j$ tandis que l'algorithme (j, i, k) résoud les sous-problèmes de la forme $i \ldots j$ sont résolus avant ceux de la forme $i \ldots j + 1$. Ces deux solutions ont de meilleurs performances car elles ont une meilleur localité du cache. En effet, dans l'algorithme (i, j, k), lorsqu'une ligne est calculée, tous les éléments de cette ligne sont accédés à la suite.
+
 Concernant le nombre de défauts de cache :
 \begin{enumerate}
   \item Si le cache est assez grand pour contenir tous les espaces de stockage, c'est-à-dire si $Z \gg n(n+1) + 2n$ alors $Q(n, L, Z) = \frac{n(n+1) + 2n}{L} = O(\frac{n^2}{L})$.
@@ -109,51 +113,52 @@ Concernant le nombre de défauts de cache :
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Compte rendu d'expérimentation (2 points)}
 \subsection{Conditions expérimentales}
-{\em Décrire les conditions permettant la reproductibilité des mesures: on demande la description
-  de la machine et la méthode utilisée pour mesurer le temps.
-}
 
 \subsubsection{Description synthétique de la machine\,:}
-{\em indiquer ici le  processeur et sa fréquence, la mémoire, le système d'exploitation.
-  Préciser aussi si la machine était monopolisée pour un test, ou notamment si
-  d'autres processus ou utilisateurs étaient en cours d'exécution.
-}
+
+La machine sur laquelle ont été prises les mesures est d'architecture x86\_64 Little Endian, possède 4 coeurs Intel(R) Core(TM) i5-2520M CPU @ 2.50GHz pour 2 threads par coeur et 2 coeurs par socket, une fréquence du CPU mesurée de 1253.326 MHz pour un minimum de 800 MHz et un maximum de 3200 MHz, les caches L1d et L1i de 64 KiB chacun, le cache L2 de 512 KiB et le cache L3 de 3 MiB. 
+A cela s'ajoutent 6 GB de RAM DDR3-SODIMM, 1333 MT/s, répartis en 2 barrettes de 4 GB et 2 GB.
+\\
+
+La machine n'était pas mobilisée pour un test, Firefox et Codium d'exécutaient en tâche de fond.
 
 \subsubsection{Méthode utilisée pour les mesures de temps\,: }
-{\em préciser ici  comment les mesures de temps ont été effectuées (fonction appelée) et l'unité de temps; en particulier,
-  préciser comment les 5 exécutions pour chaque test ont été faites (par exemple si le même test est fait 5 fois de suite, ou si les tests sont alternés entre
-  les mesures, ou exécutés en concurrence etc).
-}
+
+Les mesures sont effectuées en exécutant le script {\em time\_benchmarks.sh}. Les trois programmes Bellman sont alors exécutés successivement 10 fois de suite sur le même fichier, dans l'ordre (d, i, k), (i, j, k) puis (j, i, k). Nous avons observé que l'ordre des fonctions n'influence pas le résultat. 
+On utilise le module {\em timing.c} implémentant un décorateur autour des fonctions Bellman avec la fonction {\em clock()} de {\em time.h}. Les résultats sont donnés en secondes. \\
+
+Nous avons réalisé 5 appels non consécutifs à ce script afin d'obtenir des mesures indépendantes de l'état du processeur. \\
+
+L'exécution de {\em valgrind} sur {\em benchmark6} donne 150,115,592 bytes alloués, soit environ 150 MB. On obtient un nombre bien plus élevé si l'on choisit de stocker les matrices triangulaires inférieures de zéros.
 
 \subsection{Mesures expérimentales}
-{\em Compléter le tableau suivant par les temps d'exécution mesurés pour chacun des 6 benchmarks imposés
-  (temps minimum, maximum et moyen sur 5 exécutions)
-}
 
 \begin{figure}[h]
   \begin{center}
-    \begin{tabular}{|l||r||r|r|r||}
+    \begin{tabular}{|l||r|r|r|r|r|r|r|r|r||}
       \hline
       \hline
-                 & coût     & temps & temps & temps \\
-                 & du patch & min   & max   & moyen \\
+      & \multicolumn{3}{c|}{Bellman (d, i, k)} & \multicolumn{3}{c|}{Bellman (i, j, k)} & \multicolumn{3}{c|}{Bellman (j, i, k)}\\
+      \hline
+                 & temps & temps & temps & temps & temps & temps & temps & temps & temps \\
+                 & min   & max   & moyen & min   & max   & moyen & min   & max   & moyen \\
       \hline
       \hline
-      benchmark1 &          &       &       &       \\
+      benchmark1 & 1e-06 & 6e-06 & 2.5e-06 & 1e-06 & 3e-06 & 1.62e-06 & 1e-06 & 3e-06 & 1.48e-06 \\
       \hline
-      benchmark2 &          &       &       &       \\
+      benchmark2 & 2e-06 & 6e-06 & 3.28e-06 & 2e-06 & 4e-06 & 2.3e-06 & 2e-06 & 5e-06 & 2.54e-06 \\
       \hline
-      benchmark3 &          &       &       &       \\
+      benchmark3 & 0.0110 & 0.0162 & 0.0123 & 0.0043 & 0.0066 & 0.0046 & 0.0080 & 0.0101 & 0.0086 \\
       \hline
-      benchmark4 &          &       &       &       \\
+      benchmark4 & 0.037 & 0.100 & 0.062 & 0.019 & 0.031 & 0.022 & 0.030 & 0.067 & 0.046 \\
       \hline
-      benchmark5 &          &       &       &       \\
+      benchmark5 & 0.088 & 0.215 & 0.161 & 0.045 & 0.082 & 0.056 & 0.072 & 0.192 & 0.126 \\
       \hline
-      benchmark6 &          &       &       &       \\
+      benchmark6 & 0.489 & 0.867 & 0.641 & 0.166 & 0.247 & 0.180 & 0.370 & 0.646 & 0.484 \\
       \hline
       \hline
     \end{tabular}
-    \caption{Mesures des temps minimum, maximum et moyen de 5 exécutions pour les 6 benchmarks.}
+    \caption{Mesures des temps minimum, maximum et moyen de 50 exécutions pour les 6 benchmarks et les 3 programmes Bellman.}
     \label{table-temps}
   \end{center}
 \end{figure}
@@ -163,19 +168,9 @@ Concernant le nombre de défauts de cache :
   les  temps mesurés correspondent ils  à votre analyse théorique (nombre d’opérations et défauts de cache) ?
 }
 
+Sans surprise, l'algorithme de Bellman (d, i, k) (38.2\% cache-misses) est le moins performant tandis que l'algorithme (i, j, k) (9.9\% cache-misses), itérant ligne par ligne, est le plus performant. Le dernier algorithme, (j, i, k) (28.4\% cache-misses), est légèrement plus performant que (d, i, k).
 
 \end{document}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Question bonus\,: programme {\tt mystere.c}(2 points)}
-\subsection{Que fait le programme mystère et dans quel but? (1.5 point)}
-{\em Dire brièvement ce que fait le programme mystere et quel est l'impact lors de l'exécution
-  (i.e. lors de recherches avec le dictionnaire) de ce post-traitement.}
-
-\subsection{Qu'en pensez-vous? (0.5 point) }
-{\em Répondre à l'argumentation en justifiant : soit que le programme mystere est (presque) optimal (justifier les hypothèses) ; soit qu'il n'est pas optimal en
-  justifiant comment faire encore mieux.
-}
 
 %% Fin mise au format
 

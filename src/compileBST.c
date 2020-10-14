@@ -249,7 +249,7 @@ int main(int argc, char *argv[]) {
 
     /* Test bellman */
     // printf("\nTest bellman dik:\n");
-    run_bellman_fn(c, r, probabilities, sommes_p, n, bst, bellman);
+    // run_bellman_fn(c, r, probabilities, sommes_p, n, bst, bellman);
 
     /* Test bellman 2 */
     // printf("\nTest bellman ijk:\n");
@@ -257,7 +257,7 @@ int main(int argc, char *argv[]) {
 
     /* Test bellman 3 */
     // printf("\nTest bellman jik:\n");
-    // run_bellman_fn(c, r, probabilities, sommes_p, n, bst, bellman_3);
+    run_bellman_fn(c, r, probabilities, sommes_p, n, bst, bellman_3);
 
     free(probabilities);
     free(sommes_p);

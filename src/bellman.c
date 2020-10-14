@@ -114,7 +114,7 @@ void bellman_3(uint64_t *c, int *r, uint64_t *probabilities, uint64_t *sommes_p,
     for (int j = 0; j < n; ++j) {
         c(j, j, n) = probabilities[j];
         r(j, j, n) = j;
-        for (int i = ((j != 0) ? j - 1 : 0); i != -1; --i) {
+        for (int i = ((j != 0) ? j - 1 : -1); i != -1; --i) {
             min = get_min(i, j, n, c, r);
             if (i > 0) {
                 c(i, j, n) = min + sommes_p(i - 1, j);

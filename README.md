@@ -96,7 +96,8 @@ Time complexity = n(n + 1)(n + 2)/6
 ```bash
 $gnuplot
 gnuplot> set key outside
-gnuplot> plot for [col=1:3] 'benchmarks/benchmark6.perf' using 0:col with lines
+gnuplot> set grid
+gnuplot> plot for [col=1:3] 'benchmarks/benchmark6.perf' using 0:col with yerrorlines
 ```
 
 ```bash
@@ -105,4 +106,8 @@ $valgrind --tool=cachegrind --log-file=valgrind-cachegrindijk.txt ./bin/compileB
 $sudo perf stat -e task-clock,cycles,instructions,cache-references,cache-misses,L1-dcache-loads,L1-dcache-load-misses ./bin/compileBST 5000 benchmarks/benchmark6.in
 $sudo perf record -e cache-misses ./bin/compileBST 5000 benchmarks/benchmark6.in
 $sudo perf report --stdio --header
+
+function colstat {
+	awk -v col=$1 '{if(min==""){min=max=$col}; if(col>max) {max=$col}; if($col<min) {min=$col}; total+=$col; count+=1} END {print "avg " total/count," | max "max," | min " min}' $2;
+}
 ```
