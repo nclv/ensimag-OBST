@@ -37,7 +37,13 @@ Pour ne pas subir le calcul des sommes pendant la construction de l'arbre, on ch
 
 Sachant que les temps asymptotiques en itératif et récursif sont les mêmes, on choisit d'employer une méthode itérative (dynamic-programming), notamment pour éviter une surchage de pile en mémoire. \par\leavevmode\par
 
-Le principe de notre algorithme se présente comme suit : on définit deux tableaux auxiliaires, notés $c$ et $r$, de taille $\frac{n(n+1)}{2}$ pour stocker les coûts et racines des sous-arbres optimaux. Le calcul se fait en ascendant, en partant de la construction des plus petits sous-arbres pour construire les plus grands. La matrice des coûts -- présentée ci-dessous -- est triangulaire supérieure, contient sur sa diagonale pricipale les coûts des sous-arbres optimaux dont le nombre de sommets est égal à $1$. On rappelle que notre programme ne stocke que la partie triangulaire supérieure, on dispose d'un itérateur pour parcourir tous ces coefficients. \par\leavevmode\par
+Le principe de notre algorithme se présente comme suit : on définit deux tableaux auxiliaires, notés $c$ et $r$, de taille $\frac{n(n+1)}{2}$ pour stocker les coûts et racines des sous-arbres optimaux. Le calcul se fait en ascendant, en partant de la construction des plus petits sous-arbres pour construire les plus grands. La matrice des coûts -- présentée ci-dessous -- est triangulaire supérieure, contient sur sa diagonale pricipale les coûts des sous-arbres optimaux dont le nombre de sommets est égal à $1$. On rappelle que notre programme ne stocke que la partie triangulaire supérieure, on dispose d'un itérateur pour parcourir tous ces coefficients. 
+
+Nous avons choisi de représenter la matrice $c$ par un tableau 1d contenant les lignes de la matrice triangulaire supérieures ordonnées par ordre croissant. Cette représentation est optimale pour l'itération $(i, j, k)$. Nous avons aussi testé de stocker les diagonales de la matrice triangulaire supérieure, ordonnées de la diagonale inférieure jusqu'à $c(0, n - 1)$. On divise alors par deux le temps de calcul de l'algorithme $(d, i, k)$. Les algorithmes $(i, j, k)$ et $(j, i, k)$ prennent le même temps de calcul, ils sont plus longs qu'avec la première méthode de stockage. Cette deuxième méthode de stockage pourrait être plus efficace si l'on parallélise le calcul des coefficients de chaque diagonale. Ce n'est pas celle qui a été retenue dans la suite du TP.
+
+Pour observer les différences entre les deux méthodes de stockage, modifiez les macros de {\em src/bellman.h}.
+
+\par\leavevmode\par
 \[
   \left(
   \begin{array}{ccccc}
@@ -98,9 +104,9 @@ Sachant que la construction de l'arbre complet depuis $r$ demande un espace mém
 
 \subsection{Nombre de défauts de cache sur le modèle CO\,: }
 
-L'algorithme de Bellman (d, i, k) a des très mauvaises localités temporelle et spatiale. On mesure en effet 38.2\% de miss-rate sur le cache L1. Prenons le calcul de la $d$-ième diagonale. Toutes les entrées précalculées à gauche et en dessous de la diagonale $d$ sont accédées.
+L'algorithme de Bellman $(d, i, k)$ a des très mauvaises localités temporelle et spatiale. On mesure en effet 38.2\% de miss-rate sur le cache L1. Prenons le calcul de la $d$-ième diagonale. Toutes les entrées précalculées à gauche et en dessous de la diagonale $d$ sont accédées.
 
-Les deux autres algorithmes calculent les sous-problèmes en suivant un ordre différent. Pour l'algorithme (i, j, k), les sous-problèmes de la forme $i \ldots j$ sont résolus avant ceux de la forme $i - 1 \ldots j$ tandis que l'algorithme (j, i, k) résoud les sous-problèmes de la forme $i \ldots j$ sont résolus avant ceux de la forme $i \ldots j + 1$. Ces deux solutions ont de meilleurs performances car elles ont une meilleur localité du cache. En effet, dans l'algorithme (i, j, k), lorsqu'une ligne est calculée, tous les éléments de cette ligne sont accédés à la suite.
+Les deux autres algorithmes calculent les sous-problèmes en suivant un ordre différent. Pour l'algorithme $(i, j, k)$, les sous-problèmes de la forme $i \ldots j$ sont résolus avant ceux de la forme $i - 1 \ldots j$ tandis que l'algorithme $(j, i, k)$ résoud les sous-problèmes de la forme $i \ldots j$ sont résolus avant ceux de la forme $i \ldots j + 1$. Ces deux solutions ont de meilleurs performances car elles ont une meilleur localité du cache. En effet, dans l'algorithme $(i, j, k)$, lorsqu'une ligne est calculée, tous les éléments de cette ligne sont accédés à la suite.
 
 Concernant le nombre de défauts de cache :
 \begin{enumerate}
