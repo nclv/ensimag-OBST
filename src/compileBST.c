@@ -109,8 +109,8 @@ void run_bellman_fn(uint64_t *c, int *r,
     (*bellman_fn)(c, r, probabilities, sommes_p, n);
 
     // printf("Matrice des coûts c:\n");
-    // afficher_tableau_trig_double(c, n);
-    // printf("Profondeur minimale: %f\n", c(0, n - 1, n));
+    // afficher_tableau_trig_uint(c, n);
+    // printf("Profondeur minimale: %ld\n", c(0, n - 1, n));
     // printf("Matrice des racines r:\n");
     // afficher_tableau_trig_int(r, n);
 
@@ -227,13 +227,13 @@ int main(int argc, char *argv[]) {
         .sommes_p = sommes_p,
         .n = n,
     };
-    // printf("\nTest bellman dik:\n");
-    // bellman_fn_execution_time(&bellman_args, bellman);
-    // printf("\nTest bellman ijk:\n");
-    // bellman_fn_execution_time(&bellman_args, bellman_2);
-    // printf("\nTest bellman jik:\n");
-    // bellman_fn_execution_time(&bellman_args, bellman_3);
-    // printf("\n");
+    printf("\nTest bellman dik:\n");
+    bellman_fn_execution_time(&bellman_args, bellman);
+    printf("\nTest bellman ijk:\n");
+    bellman_fn_execution_time(&bellman_args, bellman_2);
+    printf("\nTest bellman jik:\n");
+    bellman_fn_execution_time(&bellman_args, bellman_3);
+    printf("\n");
 
     // printf("Matrice des coûts c:\n");
     // afficher_tableau_trig_double(c, n);
@@ -257,7 +257,7 @@ int main(int argc, char *argv[]) {
 
     /* Test bellman 3 */
     // printf("\nTest bellman jik:\n");
-    run_bellman_fn(c, r, probabilities, sommes_p, n, bst, bellman_3);
+    // run_bellman_fn(c, r, probabilities, sommes_p, n, bst, bellman_3);
 
     free(probabilities);
     free(sommes_p);

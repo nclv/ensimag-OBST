@@ -55,7 +55,7 @@ void bellman(uint64_t *c, int *r, uint64_t *probabilities, uint64_t *sommes_p, i
     for (int i = 0; i < n; ++i) {
         c(i, i, n) = probabilities[i];
         r(i, i, n) = (int)i;
-        // printf("c(%li, %li) = %.2f\n", i, i, c(i, i, n));
+        // printf("c(%i, %i) = %.2ld\n", i, i, c(i, i, n));
     }
 
     /** 
