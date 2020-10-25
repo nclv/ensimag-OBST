@@ -1,3 +1,4 @@
-src/bellman.c:53:6:bellman	144	static
-src/bellman.c:96:6:bellman_2	144	static
-src/bellman.c:112:6:bellman_3	128	static
+bellman.c:72:13:bellman._omp_fn.0	112	static
+bellman.c:55:6:bellman	80	static
+bellman.c:102:6:bellman_2	144	static
+bellman.c:118:6:bellman_3	144	static

@@ -130,7 +130,7 @@ La machine n'était pas mobilisée pour un test, Firefox et Codium d'exécutaien
 
 \subsubsection{Méthode utilisée pour les mesures de temps\,: }
 
-Les mesures sont effectuées en exécutant le script {\em time\_benchmarks.sh}. Les trois programmes Bellman sont alors exécutés successivement 10 fois de suite sur le même fichier, dans l'ordre (d, i, k), (i, j, k) puis (j, i, k). Nous avons observé que l'ordre des fonctions n'influence pas le résultat. 
+Les mesures sont effectuées en exécutant le script {\em time\_benchmarks.sh}. Les trois programmes Bellman ($(d, i, k)$ non parallélisé) sont alors exécutés successivement 10 fois de suite sur le même fichier, dans l'ordre (d, i, k), (i, j, k) puis (j, i, k). Nous avons observé que l'ordre des fonctions n'influence pas le résultat. 
 On utilise le module {\em timing.c} implémentant un décorateur autour des fonctions Bellman avec la fonction {\em clock()} de {\em time.h}. Les résultats sont donnés en secondes. \\
 
 Nous avons réalisé 5 appels non consécutifs à ce script afin d'obtenir des mesures indépendantes de l'état du processeur. \\
@@ -174,7 +174,9 @@ L'exécution de {\em valgrind} sur {\em benchmark6} donne 150,115,592 bytes allo
   les  temps mesurés correspondent ils  à votre analyse théorique (nombre d’opérations et défauts de cache) ?
 }
 
-Sans surprise, l'algorithme de Bellman (d, i, k) (38.2\% cache-misses) est le moins performant tandis que l'algorithme (i, j, k) (9.9\% cache-misses), itérant ligne par ligne, est le plus performant. Le dernier algorithme, (j, i, k) (28.4\% cache-misses), est légèrement plus performant que (d, i, k).
+Sans surprise, l'algorithme de Bellman $(d, i, k)$ (38.2\% cache-misses) est le moins performant tandis que l'algorithme $(i, j, k)$ (9.9\% cache-misses), itérant ligne par ligne, est le plus performant. Le dernier algorithme, $(j, i, k)$ (28.4\% cache-misses), est légèrement plus performant que $(d, i, k)$.
+
+Nous avons parallélisé l'algorithme $(d, i, k)$ sans obtenir de résultats visibles. Il est 2 fois plus lent ce qui est très étonnant. Le calcul en parallèle de chaque coefficient d'une même diagonale devrait accélérer l'exécution. L'optimisation des défauts de caches semble primer ici sur le parallélisme.
 
 \end{document}
 

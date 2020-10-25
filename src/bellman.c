@@ -3,6 +3,7 @@
 #include <limits.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <omp.h>
 
 #include "partial_probabilities.h"
 
@@ -22,14 +23,15 @@ static inline uint64_t get_min(int i, int j, int n, uint64_t *c, int *r) {
     // on utilise des int car k - 1 peut être négatif
     // Knuth, 1971
     // for (int k = i; k <= j; ++k) {
+    #pragma omp simd reduction(min:min)
     for (int k = argmin; k <= r(i + 1, j, n); ++k) {
         // printf("c(%i, %i) + c(%i, %i) = %.2f + %.2f\n", i, k - 1,
         //        k + 1, j, c(i, k - 1, n), c(k + 1, j, n));
         /** 
-         * Attention aux cas limites pour i == k et j == k
-         * si i == k: temp = c(k + 1, j, n)
-         * si j == k: temp = c(i, k - 1, n)
-         */
+        * Attention aux cas limites pour i == k et j == k
+        * si i == k: temp = c(k + 1, j, n)
+        * si j == k: temp = c(i, k - 1, n)
+        */
         temp = ((i < k) ? c(i, k - 1, n) : 0) + ((j > k) ? c(k + 1, j, n) : 0);
         if (temp < min) {
             min = temp;
@@ -66,20 +68,24 @@ void bellman(uint64_t *c, int *r, uint64_t *probabilities, uint64_t *sommes_p, i
      */
     uint64_t min;
     int j;
+    // création de threads en parallèle
+    #pragma omp parallel default(shared)
     for (int diagonal = 1; diagonal < n; ++diagonal) {
-        for (int i = 0; i != n - diagonal; ++i) {
+        // on distribue la boucle sur i parmis les threads
+        #pragma omp for 
+        for (int i = 0; i < n - diagonal; ++i) {
             j = i + diagonal;
             /* Récupération de la valeur qui minimise c(i, k) - c(k + 1, j), i <= k < j */
             min = get_min((int)i, (int)j, (int)n, c, r);
             // printf("min: %.2f\n", min);
             /** 
-             * Notre précalcul des sommes partielles des probabilités nous oblige à 
-             * considérer 2 cas, en effet sommes_p[j] contient la sommes des probabilités 
-             * de p_0 à p_j inclu:
-             * 
-             * si i == 0 (ie. on veut la somme de 0 inclu à j inclu): on prend sommes_p[j]
-             * sinon: on prend sommes_p[j] - sommes_p[i - 1] (ici avec une macro)
-             */
+            * Notre précalcul des sommes partielles des probabilités nous oblige à 
+            * considérer 2 cas, en effet sommes_p[j] contient la sommes des probabilités 
+            * de p_0 à p_j inclu:
+            * 
+            * si i == 0 (ie. on veut la somme de 0 inclu à j inclu): on prend sommes_p[j]
+            * sinon: on prend sommes_p[j] - sommes_p[i - 1] (ici avec une macro)
+            */
             if (i > 0) {
                 // printf("sommes_p[%li] - sommes_p[%li]: %.2f\n", j, i, sommes_p(i - 1, j));
                 // printf("= %.2f - %.2f\n", sommes_p[j], sommes_p[i - 1]);
@@ -89,8 +95,8 @@ void bellman(uint64_t *c, int *r, uint64_t *probabilities, uint64_t *sommes_p, i
                 c(i, j, n) = min + sommes_p[j];
             }
             // printf("c(%li, %li) = %.2f\n", i, j, c(i, j, n));
-        }
-    }
+        } // barrière implicite, tous les threads attendent la fin de la boucle avant de passer à la diagonale suivante
+    } // fin de la boucle parallèle
 }
 
 void bellman_2(uint64_t *c, int *r, uint64_t *probabilities, uint64_t *sommes_p, int n) {
