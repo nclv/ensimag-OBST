@@ -102,19 +102,36 @@ Notons qu'avec un algorithme récursif la complexité est exponentielle. la rela
 \subsection{Place mémoire requise\,: }
 Sachant que la construction de l'arbre complet depuis $r$ demande un espace mémoire de $2n$, notre algorithme utilise un espace mémoire de $2\frac{n(n+1)}{2} + n + 2n = O(n^2)$. \par\leavevmode\par
 
+Un fois le calcul de l'arbre terminé, on peut libérer les arrays des coûts et des probabilités partielles.
+
 \subsection{Nombre de défauts de cache sur le modèle CO\,: }
 
 L'algorithme de Bellman $(d, i, k)$ a des très mauvaises localités temporelle et spatiale. On mesure en effet 38.2\% de miss-rate sur le cache L1. Prenons le calcul de la $d$-ième diagonale. Toutes les entrées précalculées à gauche et en dessous de la diagonale $d$ sont accédées.
 
 Les deux autres algorithmes calculent les sous-problèmes en suivant un ordre différent. Pour l'algorithme $(i, j, k)$, les sous-problèmes de la forme $i \ldots j$ sont résolus avant ceux de la forme $i - 1 \ldots j$ tandis que l'algorithme $(j, i, k)$ résoud les sous-problèmes de la forme $i \ldots j$ sont résolus avant ceux de la forme $i \ldots j + 1$. Ces deux solutions ont de meilleurs performances car elles ont une meilleur localité du cache. En effet, dans l'algorithme $(i, j, k)$, lorsqu'une ligne est calculée, tous les éléments de cette ligne sont accédés à la suite.
 
-Concernant le nombre de défauts de cache :
-\begin{enumerate}
-  \item Si le cache est assez grand pour contenir tous les espaces de stockage, c'est-à-dire si $Z \gg n(n+1) + 2n$ alors $Q(n, L, Z) = \frac{n(n+1) + 2n}{L} = O(\frac{n^2}{L})$.
-  \item Si le cache est trop petit pour contenir un espace de taille $n$, c'est-à-dire si $Z \ll n$ alors on a déjà $\frac{n}{L}$ défauts de cache pour écrire la diagonale principale.
-\end{enumerate}
-\paragraph{Justification\,: }
 
+Concernant le nombre de défauts de cache :
+
+Si le cache est assez grand pour contenir tous les espaces de stockage, c'est-à-dire si $Z \gg n(n+1) + 2n$ alors $Q(n, L, Z) = \frac{n(n+1) + 2n}{L} = O(\frac{n^2}{L})$.
+
+Prenons l'algorithme $(i, j, k)$. On suppose que l'exécution de la boucle interne {\em for (int j = i + 1; j < n; ++j)} tient en cache (ie. $Z \gg \frac{n(n + 1)}{2} + n + n$ pour $c$, $sommes_p$ et $r$).
+Cela revient à dire que pour le calcul d'une ligne de $c$, le cache peut contenir toutes les lignes en dessous ainsi que la ligne que l'on cherche à calculer en plus d'une ligne de $r$ et de $sommes_p$.
+Le tableau $probabilities$ est parcouru par ligne donc $\frac{n}{L}$ défauts de cache en lecture.
+Le tableau $sommes_p$ est parcouru par ligne donc $\frac{n}{L}$ défauts de cache en lecture.
+La matrice $c$ (de taille $\frac{n(n + 1)}{2}$) tient dans le cache et supposons que $Z \ll n(n + 1) + n + n$. Les lignes de $r$ s'accumulent dans le cache alors qu'on n'en a plus l'utilité.
+Pour faire de l'espace aux coefficients de $c$, les premières entrées de $c$ présentes dans le cache vont être supprimées alors qu'elles sont nécessaires au calcul.
+On aura donc des défauts de cache supplémentaires sur $c$. On aura donc $\frac{n^2(n + 1)}{2L}$ défauts de cache sur $c$ en lecture et écriture.
+La matrice $r$ est parcourues par ligne donc $\frac{n(n + 1)}{2L}$ défauts de cache en écriture.
+
+Pour l'algorithme $(j, i, k)$, on intervertit lignes et colonnes. On a donc 1 défaut par élément pour $r$ soit $\frac{n(n + 1)}{L}$ défauts de cache. 
+Pour $c$ on obtient $\frac{n^2(n + 1)}{2}$ défauts de cache.
+
+Reprenons l'algorithme $(i, j, k)$ et supposons que $Z \ll n$. La boucle interne sur $k$ génère des défauts de cache capacitifs sur $c$ mais pas sur $r$.
+$Q(n, L, Z) = \frac{n(n + 1)}{2L} + \frac{n^2(n + 1)}{2L} + 2\frac{n^2}{L} = O\bigg(\frac{n^3}{2L}\bigg)$.
+
+L'algorithme $(d, i, k)$ itérant diagonale par diagonale réalise $O(n^3)$ défauts de cache pour $Z \ll n$ (raisonner comme précédemment). 
+On a probablement le même nombre de défauts de cache (en approximation $O$) si $Z \ll n(n + 1) + n + n$.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Compte rendu d'expérimentation (2 points)}
@@ -170,9 +187,6 @@ L'exécution de {\em valgrind} sur {\em benchmark6} donne 150,115,592 bytes allo
 \end{figure}
 
 \subsection{Analyse des résultats expérimentaux}
-{\em Donner  une réponse justifiée  à la question\,:
-  les  temps mesurés correspondent ils  à votre analyse théorique (nombre d’opérations et défauts de cache) ?
-}
 
 Sans surprise, l'algorithme de Bellman $(d, i, k)$ (38.2\% cache-misses) est le moins performant tandis que l'algorithme $(i, j, k)$ (9.9\% cache-misses), itérant ligne par ligne, est le plus performant. Le dernier algorithme, $(j, i, k)$ (28.4\% cache-misses), est légèrement plus performant que $(d, i, k)$.
 

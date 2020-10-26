@@ -56,7 +56,7 @@ void bellman(uint64_t *c, int *r, uint64_t *probabilities, uint64_t *sommes_p, i
     /* Initialisation de la diagonale inférieure c(i, i) avec les p_i */
     for (int i = 0; i < n; ++i) {
         c(i, i, n) = probabilities[i];
-        r(i, i, n) = (int)i;
+        r(i, i, n) = i;
         // printf("c(%i, %i) = %.2ld\n", i, i, c(i, i, n));
     }
 
@@ -76,7 +76,7 @@ void bellman(uint64_t *c, int *r, uint64_t *probabilities, uint64_t *sommes_p, i
         for (int i = 0; i < n - diagonal; ++i) {
             j = i + diagonal;
             /* Récupération de la valeur qui minimise c(i, k) - c(k + 1, j), i <= k < j */
-            min = get_min((int)i, (int)j, (int)n, c, r);
+            min = get_min(i, j, n, c, r);
             // printf("min: %.2f\n", min);
             /** 
             * Notre précalcul des sommes partielles des probabilités nous oblige à 
