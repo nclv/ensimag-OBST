@@ -61,7 +61,6 @@ Ainsi, on dispose de $r$ contenant l'intégralité des racines des sous-arbres m
 
 L'utilisation du cache peut être améliorée. En effet, au lieu de boucler en commençant par la diagonale, $(d, i, k)$, on peut itérer en $(i, j, k)$ ou $(j, i, k)$. La boucle commençant par $i$ conduit naturellement à moins de défauts de caches, le language C ayant une structure mémoire en {\em row-major}. Nous avons implémenté et comparé ces trois algorithmes CO.
 
-Nous proposerons en ouverture un algorithme plus performant en cache.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Analyse du coût théorique}
 Pour notre programme, comme on a $\frac{n(n-1)}{2}$ possibilités pour les couples $(i, j)$ avec $0 \leq i < j < n$, l'espace requis est en $\Theta(n^2)$.
@@ -80,7 +79,18 @@ La preuve pour $r(i, j) \leq r(i + 1, j)$ est similaire. \\
 
 L'équation de Bellman devient $$C(i, j) = min_{r(i, j - 1) \leq k \leq r(i + 1, j)} C(i, k) + C(k + 1, j) + \sum \limits_{l = i}^{j - 1} p_l$$.
 
-Grâce à cette restriction, $\sum \limits_{i = 1}^{n} \sum \limits_{j = 1}^{n} r(i + 1, j) - r(i, j - 1) + 1 \leq n^2 + \sum \limits_{i = 1}^{n} r(i, n) + \sum \limits_{j = 1}^{n} r(n + 1, j) = O(n^2)$.
+Grâce à cette restriction, $$\sum \limits_{i = 1}^{n} \sum \limits_{j = 1}^{n} r(i + 1, j) - r(i, j - 1) + 1 = n^2 + \sum \limits_{i = 1}^{n} \sum \limits_{j = 1}^{n} r(i + 1, j)
+- \sum \limits_{i = 1}^{n} \sum \limits_{j = 1}^{n} r(i, j - 1)$$ 
+$$= 
+n^2 + \sum \limits_{i = 2}^{n + 1} \sum \limits_{j = 1}^{n} r(i, j)
+- \sum \limits_{i = 1}^{n} \sum \limits_{j = 0}^{n - 1} r(i, j)
+\leq n^2 + \sum \limits_{i = 1}^{n + 1} \sum \limits_{j = 1}^{n} r(i, j)
+- \sum \limits_{i = 1}^{n} \sum \limits_{j = 1}^{n - 1} r(i, j)$$
+$$\leq n^2 + \sum \limits_{i = 1}^{n} \sum \limits_{j = 1}^{n} r(i, j)
++ \sum \limits_{j = 1}^{n} r(n + 1, j)
+- (\sum \limits_{i = 1}^{n} \sum \limits_{j = 1}^{n} r(i, j) -
+\sum \limits_{i = 1}^{n} (i, n))
+\leq n^2 + \sum \limits_{i = 1}^{n} r(i, n) + \sum \limits_{j = 1}^{n} r(n + 1, j) = O(n^2)$$.
 
 Le temps de calcul devient $O(n^2)$.
 \subsection{Nombre  d'opérations en pire cas\,: }
@@ -94,8 +104,8 @@ Déterminons le nombre d'opérations en pire cas en prenant comme indicateurs le
 \end{enumerate}
 Le programme itératif contient la boucle $r(i + 1, j)...r(i, j - 1)$ imbriquée dans $0...n - d + 1$ imbriquée dans $1...n - 1$ correspondant à la somme :
 $$T(n) = \sum_{i=0}^{n - 1} 2 + \sum_{d=1}^{n - 1} \sum_{i = 0}^{n - d + 1} 9\sum_{k=r(i + 1, i + d)}^{r(i, i + d - 1)} 5 = 2n + \sum_{d=1}^{n - 1} \sum_{i = 0}^{n - d + 1} 45 (r(i, i + d - 1) - r(i + 1, i + d) + 1)$$
-$$\leq 2n + \sum_{d=1}^{n - 1} \sum_{i = 0}^{n - d + 1} 45n$$%\mbox{comme r(i, i + d - 1) - r(i + 1, i + d) + 1 \leq n}$$
-$$= 2n + \sum_{d=1}^{n - 1} (n - d + 2)n = 2n + n^2(n - 1) -n\frac{n(n - 1)}{2} + 2n(n - 1) = O(n^3)$$
+$$\leq 2n + \sum_{d=1}^{n - 1} \sum_{i = 0}^{n - d + 1} 45n $$%\mbox{comme r(i, i + d - 1) - r(i + 1, i + d) + 1 \leq n}$$
+$$= 2n + 45n\sum_{d=1}^{n - 1} (n - d + 2) = 2n + (45n^2(n - 1) -45n\frac{n(n - 1)}{2} + 90n(n - 1)) = O(n^3)$$
 On en déduit un nombre d'opérations de $O(n^3)$. C'est cohérent. En effet, la distance entre $r(i + 1, j)$ et $r(i, j - 1)$ n'est pas constante dans le pire des cas mais l'est en moyenne.
 
 Notons qu'avec un algorithme récursif la complexité est exponentielle. la relation de récurrence est de la forme $T(i, j) = \sum_k T(i, k - 1) + \sum_k T(k + 1, j) + 1$ et $T(i, i) = 1$. On trouve par substitution que $T(i, j) = \Theta(3^{j - i})$. Le calcul de $C(0, n - 1)$ prend donc un temps en $\Theta(3^n)$.
