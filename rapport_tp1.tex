@@ -132,7 +132,7 @@ Le tableau $sommes_p$ est parcouru par ligne donc $\frac{n}{L}$ défauts de cach
 La matrice $c$ (de taille $\frac{n(n + 1)}{2}$) tient dans le cache et supposons que $Z \ll n(n + 1) + n + n$. Les lignes de $r$ s'accumulent dans le cache alors qu'on n'en a plus l'utilité.
 Pour faire de l'espace aux coefficients de $c$, les premières entrées de $c$ présentes dans le cache vont être supprimées alors qu'elles sont nécessaires au calcul.
 On aura donc des défauts de cache supplémentaires sur $c$. On aura donc $\frac{n^2(n + 1)}{2L}$ défauts de cache sur $c$ en lecture et écriture.
-La matrice $r$ est parcourues par ligne donc $\frac{n(n + 1)}{2L}$ défauts de cache en écriture.
+La matrice $r$ est parcourue par ligne donc $\frac{n(n + 1)}{2L}$ défauts de cache en écriture.
 
 Pour l'algorithme $(j, i, k)$, on intervertit lignes et colonnes. On a donc 1 défaut par élément pour $r$ soit $\frac{n(n + 1)}{L}$ défauts de cache. 
 Pour $c$ on obtient $\frac{n^2(n + 1)}{2}$ défauts de cache.
@@ -153,7 +153,7 @@ La machine sur laquelle ont été prises les mesures est d'architecture x86\_64 
 A cela s'ajoutent 6 GB de RAM DDR3-SODIMM, 1333 MT/s, répartis en 2 barrettes de 4 GB et 2 GB.
 \\
 
-La machine n'était pas mobilisée pour un test, Firefox et Codium d'exécutaient en tâche de fond.
+La machine n'était pas mobilisée pour un test, Firefox et Codium s'exécutaient en tâche de fond.
 
 \subsubsection{Méthode utilisée pour les mesures de temps\,: }
 
