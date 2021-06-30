@@ -1,4 +1,0 @@
-compileBST.c:59:6:build_bst	80	static
-compileBST.c:81:6:print_bst	64	static
-compileBST.c:105:6:run_bellman_fn	64	static
-compileBST.c:132:5:main	144	dynamic
