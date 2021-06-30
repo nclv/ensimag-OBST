@@ -55,13 +55,13 @@ function colstat {
 }
 ```
 
-## Report
+## Report
 
 See [the Latex source](rapport/rapport_tp1.tex) or [the PDF](rapport/rapport_tp1.pdf).
 
 ## Notes
 
-### Calcul des sommes partielles
+### Calcul des sommes partielles
 On effectue un pré-calcul $somme_p(i, j) = \sum_{l=i}^{j-1}p_l$ pour tout $0 \leq i < j < n$. On accède ensuite à la somme partielle des probabilités entre $i$ et $j$ par $\lstinline{sommes_p(i, j)}$.
 
 ```C
